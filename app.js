@@ -2,6 +2,7 @@ var kiwi = require('kiwi'),
 	sys = require('sys');
 
 kiwi.require('express');
+kiwi.require('jade');
 
 configure(function() {
 	use(MethodOverride);
@@ -14,7 +15,7 @@ configure(function() {
 get('/', function() {
 	var self = this;
 	
-	self.render('blog_index.html.haml', {
+	self.render('blog_index.html.jade', {
 		locals: {
 			title: 'Blog'
 		}
