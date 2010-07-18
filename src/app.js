@@ -1,25 +1,42 @@
-var kiwi = require('kiwi'),
-	sys = require('sys');
+var sys = require('sys'),
+	connect = require('connect'),
+	app = require('express').createServer(),
+	pub = __dirname + '/public';
 
-kiwi.require('express');
-kiwi.require('jade');
-
-configure(function() {
-	use(MethodOverride);
-	use(ContentLength);
-	use(Logger);
+app.configure(function() {
+	app.set('views', __dirname + '/views');
+	app.set('view engine', 'jade');
 	
-	set('root', __dirname);
+	app.use('/', connect.logger());
+	app.use('/', connect.bodyDecoder());
+	app.use('/', connect.methodOverride());
+	app.use('/', connect.compiler({ src: pub, enable: ['sass'] }));
+	app.use('/', connect.staticProvider(pub));
+	
+	sys.puts('global configure');
 });
 
-get('/', function() {
-	var self = this;
+app.configure('development', function() {
+	app.set('reload views', 1000);
 	
-	self.render('blog_index.html.jade', {
+	app.use('/', connect.errorHandler({ dumpExceptions: true, showStack: true }));
+	
+	sys.puts('dev configure');
+});
+
+app.configure('production', function() {
+	app.use('/', connect.errorHandler());
+	
+	sys.puts('prod configure');
+});
+
+
+app.get('/', function(req, res) {
+	res.render('blog_index', {
 		locals: {
 			title: 'Blog'
 		}
 	});
 });
 
-run();
+app.listen(8000);
