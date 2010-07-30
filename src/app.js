@@ -1,6 +1,7 @@
 var sys = require('sys'),
 	connect = require('connect'),
 	app = require('express').createServer(),
+    repo = require('./mongo_repository'),
 	pub = __dirname + '/public';
 
 app.set('views', __dirname + '/views');
@@ -28,11 +29,21 @@ app.configure('production', function() {
 
 
 app.get('/', function(req, res) {
-	res.render('blog_index', {
-		locals: {
-			title: 'Blog'
-		}
-	});
+    repo.findAll(function(err, results) {
+        results.each(function(err, item) {
+            sys.puts(sys.inspect(item));
+        });
+        res.render('blog_index', {
+            locals: {
+                title: 'Blog'
+            }
+        });
+    });
+});
+
+app.post('/posts', function(req, res) {
+    repo.save();
+    res.send('');
 });
 
 app.listen(8000);
