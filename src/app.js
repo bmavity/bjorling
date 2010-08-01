@@ -4,7 +4,6 @@ var sys = require('sys')
   , repo = require('./mongo_repository')
   , pub = __dirname + '/public';
 
-app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 
 app.use(connect.logger());
