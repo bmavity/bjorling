@@ -12,21 +12,7 @@ app.use(connect.bodyDecoder());
 app.use(connect.methodOverride());
 app.use(connect.compiler({ src: pub, enable: ['sass'] }));
 app.use(connect.staticProvider(pub));
-    
-app.configure('development', function() {
-    app.set('reload views', 1000);
-    
-    app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
-    
-    sys.puts('dev configure');
-});
-
-app.configure('production', function() {
-    app.use(connect.errorHandler());
-    
-    sys.puts('prod configure');
-});
-
+app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 
 app.get('/', function(req, res) {
     repo.findAll(function(err, results) {
