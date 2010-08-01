@@ -3,23 +3,25 @@ var sys = require('sys'),
 
 var db = new mongo.Db('node-mongo-blog', new mongo.Server('localhost', 27017, {}, {}));
 
-exports.findAll = function(callback) {
+var session = function(callback) {
     db.open(function(err, repo) {
         repo.collection('posts', function(err, coll) {
-            coll.find(function(err, results) {
-                callback(err, results);
-                db.close();
-            });
+            callback(coll);
+            db.close();
         });
     });
 };
 
-exports.save = function() {
-    db.open(function(err, repo) {
-        repo.collection('posts', function(err, coll) {
-            coll.insert({ author: 'Brian Mavity' }, function() {
-                db.close();
-            });
+exports.findAll = function(callback) {
+    session(function(collection) {
+        collection.find(function(err, results) {
+            callback(err, results);
         });
+    });
+};
+
+exports.save = function(post) {
+    session(function(collection) {
+        collection.insert(post);
     });
 };
