@@ -16,11 +16,9 @@ app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 
 app.get('/', function(req, res) {
     repo.findAll(function(err, results) {
-        results.each(function(err, item) {
-            sys.puts(sys.inspect(item));
-        });
         res.render('blog_index', {
             locals: {
+                posts: results,
                 title: 'Blog'
             }
         });
@@ -28,7 +26,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/posts', function(req, res) {
-    repo.save();
+    repo.save({ author: 'Brian Mavity', postedOn: new Date() });
     res.send('');
 });
 
