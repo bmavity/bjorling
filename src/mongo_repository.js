@@ -27,3 +27,11 @@ exports.save = function(post) {
     collection.insert(post);
   });
 };
+
+exports.batch = function(posts) {
+  session(function(collection) {
+    posts.forEach(function(post) {
+      collection.insert(post);
+    });
+  });
+};
