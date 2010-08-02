@@ -1,5 +1,6 @@
 h2 
   a(href: '#')= post.title
 
-.post #{ post.publishDate } by #{ post.author }
+.post
+  p #{ post.publishDate } by #{ post.author }
   .content!= post.content
