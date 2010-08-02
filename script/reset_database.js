@@ -20,5 +20,5 @@ fs.readFile(dataDir + 'posts.json', function(err, data) {
   posts.forEach(function(post) {
     camelizedPosts.push(camelize(post));
   });
-  repo.batch(camelizedPosts);
+  repo.reset(camelizedPosts);
 });

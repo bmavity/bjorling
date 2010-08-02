@@ -28,10 +28,15 @@ exports.save = function(post) {
   });
 };
 
-exports.batch = function(posts) {
-  session(function(collection) {
-    posts.forEach(function(post) {
-      collection.insert(post);
+exports.reset = function(posts) {
+  db.open(function(err, repo) {
+    repo.dropDatabase(function(err, result) {
+      repo.collection('posts', function(err, collection) {
+        posts.forEach(function(post) {
+          collection.insert(post);
+        });
+        db.close();
+      });
     });
   });
 };
