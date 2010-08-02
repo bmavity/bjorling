@@ -14,7 +14,7 @@ var session = function(callback) {
 
 exports.findAll = function(callback) {
   session(function(collection) {
-    collection.find(function(err, cursor) {
+    collection.find({}, { sort: [['publishDate', 'desc']] }, function(err, cursor) {
       cursor.toArray(function(err, results) {
         callback(err, results);
       });
