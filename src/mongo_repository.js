@@ -1,14 +1,15 @@
 var sys = require('sys'),
-    mongo = require('mongodb');
+    mongo = require('mongodb'),
+    db = new mongo.Db('node-mongo-blog', new mongo.Server('localhost', 27017, { auto_reconnect: true }, {})),
+    repo;
 
-var db = new mongo.Db('node-mongo-blog', new mongo.Server('localhost', 27017, { auto_reconnect: true }, {}));
+db.open(function(err, _db) {
+  repo = _db;
+});
 
 var session = function(callback) {
-  db.open(function(err, repo) {
-    repo.collection('posts', function(err, coll) {
-      callback(coll);
-      db.close();
-    });
+  repo.collection('posts', function(err, coll) {
+    callback(coll);
   });
 };
 
