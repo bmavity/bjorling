@@ -4,3 +4,5 @@ h2
 .post
   p #{ post.publishDate } by #{ post.author }
   .content!= post.content
+  .comments
+    a(href: 'http://www.brianmavity.com/' + post.title.replace(' ', '-') + '/#disqus_thread') Comments
