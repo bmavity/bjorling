@@ -5,4 +5,4 @@ h2
   p #{ post.publishDate } by #{ post.author }
   .content!= post.content
   .comments
-    a(href: 'http://www.brianmavity.com/' + post.title.replace(' ', '-') + '/#disqus_thread') Comments
+    a(href: 'http://blog.brianmavity.com/' + post.slug + '#disqus_thread') Comments
