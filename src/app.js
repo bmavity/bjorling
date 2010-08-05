@@ -17,8 +17,7 @@ app.get('/', function(req, res) {
   repo.findAll(function(err, results) {
     res.render('blog_index', {
       locals: {
-        posts: results,
-        title: 'Blog'
+        posts: results
       }
     });
   });
