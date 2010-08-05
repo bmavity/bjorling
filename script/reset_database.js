@@ -1,8 +1,8 @@
-var sys = require('sys')
-  , fs = require('fs')
-  , repo = require('../src/mongo_repository')
-  , scriptDir = __dirname
-  , dataDir = scriptDir + '/../data/';
+var sys = require('sys'),
+    fs = require('fs'),
+    db = require('../src/mongo_repository'),
+    scriptDir = __dirname,
+    dataDir = scriptDir + '/../data/';
 
 sys.puts('Loading data from: ' + dataDir);
 
@@ -15,10 +15,15 @@ var camelize = function(obj) {
 };
 
 fs.readFile(dataDir + 'posts.json', function(err, data) {
-  var posts = eval('[' + data.toString().replace(/{/g, ',{').replace(',{', '{') + ']')
-    , camelizedPosts = [];
-  posts.forEach(function(post) {
-    camelizedPosts.push(camelize(post));
+  var posts = eval('[' + data.toString().replace(/{/g, ',{').replace(',{', '{') + ']');
+  db.repo(function(err, repo) {
+    repo.dropDatabase(function(err, results) {
+      repo.collection('posts', function(err, collection) {
+        posts.forEach(function(post) {
+          collection.insert(camelize(post));
+        });
+        db.close();
+      });
+    });
   });
-  repo.reset(camelizedPosts);
 });

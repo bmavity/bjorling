@@ -9,10 +9,11 @@ db.repo(function(err, repo) {
     collection.find(function(err, cursor) {
       cursor.toArray(function(err, posts) {
         posts.forEach(function(post) {
-          post.publishDate = new Date(post.publishDate);
-          collection.update({ _id: post._id }, post);
+          delete post._id;
         });
-        db.close();
+        fs.writeFile(dataDir + 'posts2.json', JSON.stringify(posts), function(err) {
+          sys.puts('finished writing file');
+        });
       });
     });
   });
