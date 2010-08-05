@@ -29,4 +29,16 @@ app.post('/posts', function(req, res) {
   res.send('');
 });
 
+app.get('/:slug', function(req, res) {
+  repo.find(req.params.slug, function(post) {
+    res.render('post_index', {
+      locals: {
+        // have to make this an array because of either a defect
+        // or poor feature choice in express or connect ;)
+        post: [post]
+      }
+    });
+  });
+});
+
 app.listen(8000);

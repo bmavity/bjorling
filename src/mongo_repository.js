@@ -42,9 +42,6 @@ exports.findAll = function(callback) {
 exports.find = function(slug, callback) {
   session(function(collection) {
     collection.findOne({ slug: slug }, function(err, post) {
-      sys.puts(slug);
-      sys.puts(sys.inspect(err));
-      sys.puts(sys.inspect(post));
       callback(post);
     });
   });
