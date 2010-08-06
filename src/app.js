@@ -1,8 +1,8 @@
-var sys = require('sys')
-  , connect = require('connect')
-  , app = require('express').createServer()
-  , repo = require('./mongo_repository')
-  , pub = __dirname + '/public';
+var sys = require('sys'),
+    connect = require('connect'),
+    app = require('express').createServer(),
+    repo = require('./mongo_repository'),
+    pub = __dirname + '/public';
 
 app.set('view engine', 'jade');
 
