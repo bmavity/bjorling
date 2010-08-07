@@ -4,6 +4,11 @@ var sys = require('sys'),
     repo = require('./mongo_repository'),
     pub = __dirname + '/public';
 
+var appRoutes = {
+  root: '/',
+  post: this.root + 'posts/:slug'
+};
+
 app.set('view engine', 'jade');
 
 app.use(connect.logger());
@@ -13,7 +18,7 @@ app.use(connect.compiler({ src: pub, enable: ['sass'] }));
 app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 
-app.get('/', function(req, res) {
+app.get(appRoutes.root, function(req, res) {
   repo.findAll(function(err, results) {
     res.render('blog_index', {
       locals: {
@@ -28,7 +33,7 @@ app.post('/posts', function(req, res) {
   res.send('');
 });
 
-app.get('/:slug', function(req, res) {
+app.get(appRoutes.post, function(req, res) {
   repo.find(req.params.slug, function(post) {
     res.render('post_index', {
       locals: {
