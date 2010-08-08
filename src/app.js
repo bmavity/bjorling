@@ -15,7 +15,9 @@ var basic = Auth.Http({
 var appRoutes = (function(appRoot) {
   var that = {};
   that.root = '/';
+  that.admin = that.root + 'admin/';
   that.post = that.root + 'posts/';
+  that.blogAdmin = that.admin + 'blog/';
   return that;
 })();
 
@@ -53,6 +55,16 @@ app.get(appRoutes.post + ':slug', function(req, res) {
     res.render('post_index', {
       locals: {
         post: post
+      }
+    });
+  });
+});
+
+app.get(appRoutes.blogAdmin, function(req, res) {
+  req.authenticate(['http'], function(err, authenticated) {
+    res.render('blog_admin', {
+      locals: {
+        s: 'admin here!'
       }
     });
   });
