@@ -4,7 +4,7 @@ var sys = require('sys'),
     scriptDir = __dirname,
     dataDir = scriptDir + '/../data/';
 
-fs.readFile(dataDir + 'posts2.json', function(err, data) {
+fs.readFile(dataDir + 'posts.json', function(err, data) {
   var posts = eval(data.toString());
   db.repo(function(err, repo) {
     repo.dropDatabase(function(err, results) {
