@@ -68,4 +68,12 @@ app.get(appRoutes.blogAdmin, function(req, res) {
   });
 });
 
+app.get(appRoutes.blogAdmin + ':pageName', function(req, res) {
+  res.render(req.params.pageName, {
+    locals:{
+      submitPostUrl: appRoutes.post
+    }
+  });
+});
+
 app.listen(8000);
