@@ -63,7 +63,7 @@ app.get(appRoutes.post + ':slug', function(req, res) {
 app.get(appRoutes.blogAdmin, function(req, res) {
   res.render('blog_admin', {
     locals: {
-      s: 'Blog Administration'
+      pageTitle: 'Blog Administration'
     }
   });
 });
