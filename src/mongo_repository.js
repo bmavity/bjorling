@@ -1,31 +1,40 @@
 var sys = require('sys'),
     mongo = require('mongodb'),
-    db = new mongo.Db('node-mongo-blog', new mongo.Server('localhost', 27017, { auto_reconnect: true }, {})),
-    repo,
-    uncalledCallback;
+    _db = new mongo.Db('node-mongo-blog', new mongo.Server('localhost', 27017, { auto_reconnect: true }, {})),
+    db,
+    dbCallback,
+    postsCollection,
+    postsCollectionCallback;
 
-db.open(function(err, _db) {
-  repo = _db;
-  if(uncalledCallback) {
-    uncalledCallback(err, repo);
-    db.close();
-    uncalledCallback = undefined;
+_db.open(function(err, dbResult) {
+  db = dbResult;
+  if(dbCallback) {
+    dbCallback(err, db);
+    dbCallback = undefined;
   }
+  db.collection('posts', function(err, collection) {
+    postsCollection = collection;
+    if(postsCollectionCallback) {
+      postsCollectionCallback(err, postsCollection);
+      postsCollectionCallback = undefined;
+    }
+  });
 });
 
 exports.repo = function(callback) {
-  if(repo) {
-    callback(null, repo);
-    db.close();
+  if(db) {
+    callback(null, db);
   } else {
-    uncalledCallback = callback;
+    dbCallback = callback;
   }
 };
 
 var session = function(callback) {
-  repo.collection('posts', function(err, coll) {
-    callback(coll);
-  });
+  if(postsCollection) {
+    callback(postsCollection);
+  } else {
+    postsCollectionCallback = callback;
+  }
 };
 exports.session = session;
 
@@ -47,12 +56,19 @@ exports.find = function(slug, callback) {
   });
 };
 
-exports.save = function(post) {
+exports.save = function(post, callback) {
   session(function(collection) {
-    collection.insert(post);
+    collection.insert(post, function(err, result) {
+      callback();
+    });
   });
 };
 
 exports.close = function() {
   db.close();
 };
+
+process.on('exit', function() {
+  db.close();
+});
+
