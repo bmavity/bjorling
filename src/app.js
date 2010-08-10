@@ -61,12 +61,10 @@ app.get(appRoutes.post + ':slug', function(req, res) {
 });
 
 app.get(appRoutes.blogAdmin, function(req, res) {
-  req.authenticate(['http'], function(err, authenticated) {
-    res.render('blog_admin', {
-      locals: {
-        s: 'admin here!'
-      }
-    });
+  res.render('blog_admin', {
+    locals: {
+      s: 'Blog Administration'
+    }
   });
 });
 
