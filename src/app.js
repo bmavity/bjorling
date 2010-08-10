@@ -43,13 +43,6 @@ app.get(appRoutes.root, function(req, res) {
   });
 });
 
-app.post(appRoutes.post, function(req, res) {
-  req.authenticate(['http'], function(error, authenticated) {
-    sys.puts(sys.inspect(req));
-    res.send('');
-  });
-});
-
 app.get(appRoutes.post + ':slug', function(req, res) {
   repo.find(req.params.slug, function(post) {
     res.render('post_index', {
@@ -57,6 +50,18 @@ app.get(appRoutes.post + ':slug', function(req, res) {
         post: post
       }
     });
+  });
+});
+
+app.post(appRoutes.post, function(req, res) {
+  repo.save({
+    author: 'Brian',
+    content: req.body.postContent,
+    publishDate: new Date(),
+    slug: req.body.slug,
+    title: req.body.title
+  }, function() {
+    res.redirect(appRoutes.post + req.body.slug);
   });
 });
 
