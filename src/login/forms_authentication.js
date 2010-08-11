@@ -22,4 +22,9 @@ function formsAuthentication() {
   };
 };
 
+function login(req, res) {
+  res.setCookie('user', req.body.userName); 
+};
+
 module.exports.formsAuthentication = formsAuthentication;
+module.exports.login = login;
