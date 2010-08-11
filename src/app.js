@@ -87,4 +87,9 @@ app.post('/login', function(req, res) {
   res.redirect(req.query.redirect_url);
 });
 
+app.get('/logout', function(req, res) {
+  res.clearCookie('user');
+  res.redirect(appRoutes.root);
+});
+
 app.listen(8000);
