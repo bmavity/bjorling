@@ -24,7 +24,7 @@ app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(connect.cookieDecoder());
 app.use(connect.session());
-//app.use(forms());
+app.use(forms());
 
 app.get(appRoutes.root, function(req, res) {
   repo.findAll(function(err, results) {
@@ -77,4 +77,5 @@ app.get(appRoutes.blogAdmin + ':pageName', function(req, res) {
 });
 
 app.use('/', require('./login'));
+
 app.listen(8000);
