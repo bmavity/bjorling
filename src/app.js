@@ -82,4 +82,9 @@ app.get('/login', function(req, res) {
   });
 });
 
+app.post('/login', function(req, res) {
+  res.setCookie('user', 'brian');
+  res.redirect(req.query.redirect_url);
+});
+
 app.listen(8000);
