@@ -24,7 +24,7 @@ app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(connect.cookieDecoder());
 app.use(connect.session());
-app.use(forms());
+//app.use(forms());
 
 app.get(appRoutes.root, function(req, res) {
   repo.findAll(function(err, results) {
@@ -76,22 +76,5 @@ app.get(appRoutes.blogAdmin + ':pageName', function(req, res) {
   });
 });
 
-app.get('/login', function(req, res) {
-  res.render('login', {
-    locals: {
-      action_url: '/login' + (req.query.redirect_url ? '?redirect_url=' + req.query.redirect_url : '')
-    }
-  });
-});
-
-app.post('/login', function(req, res) {
-  res.setCookie('user', 'brian');
-  res.redirect(req.query.redirect_url);
-});
-
-app.get('/logout', function(req, res) {
-  res.clearCookie('user');
-  res.redirect(appRoutes.root);
-});
-
+app.use('/', require('./login'));
 app.listen(8000);
