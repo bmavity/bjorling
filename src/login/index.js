@@ -20,7 +20,7 @@ app.post('/login', function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
-  res.clearCookie('user');
+  auth.logout(req, res);
   res.redirect('/');
 });
 
