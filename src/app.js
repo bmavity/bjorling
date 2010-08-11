@@ -74,4 +74,12 @@ app.get(appRoutes.blogAdmin + ':pageName', function(req, res) {
   });
 });
 
+app.get('/login', function(req, res) {
+  res.render('login', {
+    locals: {
+      action_url: '/login' + (req.query.redirect_url ? '?redirect_url=' + req.query.redirect_url : '')
+    }
+  });
+});
+
 app.listen(8000);
