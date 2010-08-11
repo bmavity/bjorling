@@ -1,16 +1,9 @@
 var sys = require('sys'),
     connect = require('connect'),
-    auth = require('connect-auth'),
+    forms = require('./forms_authentication'),
     app = require('express').createServer(),
     repo = require('./mongo_repository'),
     pub = __dirname + '/public';
-
-var basic = Auth.Http({
-  getPasswordForUser: function(username, callback) {
-    callback(null, 'a'); 
-  },
-  useBasic: true
-});
 
 var appRoutes = (function(appRoot) {
   var that = {};
@@ -31,7 +24,7 @@ app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(connect.cookieDecoder());
 app.use(connect.session());
-app.use(Auth(basic));
+app.use(forms());
 
 app.get(appRoutes.root, function(req, res) {
   repo.findAll(function(err, results) {
