@@ -47,14 +47,16 @@ app.get(appRoutes.post + ':slug', function(req, res) {
 });
 
 app.post(appRoutes.post, function(req, res) {
-  repo.save({
-    author: 'Brian',
-    content: req.body.postContent,
-    publishDate: new Date(),
-    slug: req.body.slug,
-    title: req.body.title
-  }, function() {
-    res.redirect(appRoutes.post + req.body.slug);
+  req.authenticated(function(user) {
+    repo.save({
+      author: user,
+      content: req.body.postContent,
+      publishDate: new Date(),
+      slug: req.body.slug,
+      title: req.body.title
+    }, function() {
+      res.redirect(appRoutes.post + req.body.slug);
+    });
   });
 });
 
