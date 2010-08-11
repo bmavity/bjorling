@@ -2,7 +2,7 @@ var sys = require('sys');
 
 require('cookie');
 
-module.exports = function forms_authentication() {
+module.exports.formsAuthentication = function() {
   return function(req, res, next) {
     var user = req.getCookie('user');
 

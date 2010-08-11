@@ -1,6 +1,6 @@
 var sys = require('sys'),
     connect = require('connect'),
-    forms = require('./forms_authentication'),
+    forms = require('./forms_authentication').formsAuthentication,
     app = require('express').createServer(),
     repo = require('./mongo_repository'),
     pub = __dirname + '/public';
