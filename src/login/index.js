@@ -1,5 +1,6 @@
 var sys = require('sys'),
     connect = require('connect'),
+    auth = require('./forms_authentication'),
     app = require('express').createServer();
 
 app.set('view engine', 'jade');
@@ -14,7 +15,7 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-  res.setCookie('user', req.body.userName);
+  auth.login(req, res);
   res.redirect(req.query.redirect_url);
 });
 
