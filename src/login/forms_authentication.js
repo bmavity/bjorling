@@ -39,8 +39,9 @@ function login(req, res) {
   res.setCookie('user', req.body.userName); 
 };
 
-function logout(req, res) {
+function logout(req, res, callback) {
   res.clearCookie('user');
+  callback();
 };
 
 function addProtectedPath(path) {

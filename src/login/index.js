@@ -20,8 +20,9 @@ app.post('/login', function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
-  auth.logout(req, res);
-  res.redirect('/');
+  auth.logout(req, res, function() {
+    res.redirect('/');
+  });
 });
 
 module.exports = app;
