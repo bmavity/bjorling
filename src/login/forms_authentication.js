@@ -4,20 +4,21 @@ require('cookie');
 
 function formsAuthentication() {
   return function(req, res, next) {
-    var user = req.getCookie('user');
+    var user = req.getCookie('user'),
+        redirectUrl = req.originalUrl;
 
     req.authenticated = function(callback) {
       if(user) {
         callback(user);
       } else {
-        res.redirect('/login?redirect_url=' + req.url);
+        res.redirect('/login?redirect_url=' + redirectUrl);
       }
     };
 
-    if(user || req.url.indexOf('/admin') != 0) {
+    if(user) {
       next();
     } else {
-      res.redirect('/login?redirect_url=' + req.url);
+      res.redirect('/login?redirect_url=' + redirectUrl);
     }
   };
 };

@@ -24,7 +24,7 @@ app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(connect.cookieDecoder());
 app.use(connect.session());
-app.use(forms());
+app.use(appRoutes.admin, forms());
 
 app.get(appRoutes.root, function(req, res) {
   repo.findAll(function(err, results) {
