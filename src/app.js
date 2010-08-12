@@ -1,6 +1,6 @@
 var sys = require('sys'),
     connect = require('connect'),
-    forms = require('./login/forms_authentication').formsAuthentication,
+    forms = require('./login/forms_authentication'),
     app = require('express').createServer(),
     repo = require('./mongo_repository'),
     pub = __dirname + '/public';
@@ -14,6 +14,8 @@ var appRoutes = (function(appRoot) {
   return that;
 })();
 
+forms.addProtectedPath(appRoutes.admin);
+
 app.set('view engine', 'jade');
 
 app.use(connect.logger());
@@ -24,7 +26,7 @@ app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(connect.cookieDecoder());
 app.use(connect.session());
-app.use(appRoutes.admin, forms());
+app.use(forms.formsAuthentication());
 
 app.get(appRoutes.root, function(req, res) {
   repo.findAll(function(err, results) {
@@ -49,7 +51,7 @@ app.get(appRoutes.post + ':slug', function(req, res) {
 app.post(appRoutes.post, function(req, res) {
   req.authenticated(function(user) {
     repo.save({
-      author: user,
+      author: req.user,
       content: req.body.postContent,
       publishDate: new Date(),
       slug: req.body.slug,
