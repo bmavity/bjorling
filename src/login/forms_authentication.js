@@ -35,8 +35,9 @@ function matchesProtectedPath(path) {
   }
 };
 
-function login(req, res) {
+function login(req, res, callback) {
   res.setCookie('user', req.body.userName); 
+  callback();
 };
 
 function logout(req, res, callback) {

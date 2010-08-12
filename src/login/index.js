@@ -15,8 +15,9 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-  auth.login(req, res);
-  res.redirect(req.query.redirect_url);
+  auth.login(req, res, function() {
+    res.redirect(req.query.redirect_url);
+  });
 });
 
 app.get('/logout', function(req, res) {
