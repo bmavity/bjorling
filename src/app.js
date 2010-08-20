@@ -21,7 +21,11 @@ app.set('view engine', 'jade');
 app.use(connect.logger());
 app.use(connect.bodyDecoder());
 app.use(connect.methodOverride());
-app.use(connect.compiler({ src: pub, enable: ['sass'] }));
+app.use(connect.compiler({
+  src: pub,
+  enable: ['sass'],
+  compilers: [{ name: 'scss', compiler: require(__dirname + '/../../scss-js/src/scssCompiler') }]
+}));
 app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(connect.cookieDecoder());
