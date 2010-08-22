@@ -1,0 +1,58 @@
+$beige: #FFEDBE;
+$burgundy: #78241D;
+$darkBlue: #373A45;
+$darkBrown: #5E3E35; 
+$silveryGrey: #C2C2C2;
+
+body {
+  background-color: $darkBlue;
+  a {
+    color: $burgundy;
+  }
+}
+
+#content {
+  background-color: $beige;
+  color: $darkBrown;
+}
+
+#logo {
+  a {
+    color: $darkBrown;
+  }
+}
+
+#header {
+  p {
+    color: $burgundy;
+  }
+  ul {
+    background-color: $darkBlue;
+  }
+  li {
+    a {
+      color: $silveryGrey;
+    }
+    a:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+#swooshie {
+  background-color: $darkBlue;
+  div {
+    background-color: $beige;
+  }
+}
+
+#main {
+  .percent-block {
+    border-color: $darkBrown;
+  }
+}
+
+#footer {
+  background-color: $darkBlue;
+  color: $silveryGrey;
+}
