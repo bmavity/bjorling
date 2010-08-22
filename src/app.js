@@ -23,7 +23,7 @@ app.use(connect.bodyDecoder());
 app.use(connect.methodOverride());
 app.use(connect.compiler({
   src: pub,
-  enable: ['sass'],
+  enable: ['scss', 'sass'],
   compilers: [{ name: 'scss', compiler: require(__dirname + '/../../scss-js/src/scssCompiler') }]
 }));
 app.use(connect.staticProvider(pub));
