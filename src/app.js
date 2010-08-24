@@ -24,7 +24,7 @@ app.use(connect.methodOverride());
 app.use(connect.compiler({
   src: pub,
   enable: ['scss', 'sass'],
-  compilers: [{ name: 'scss', compiler: require(__dirname + '/../../scss-js/src/scssCompiler') }]
+  compilers: [{ name: 'scss', compiler: require('scss/compiler') }]
 }));
 app.use(connect.staticProvider(pub));
 app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
