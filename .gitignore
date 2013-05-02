@@ -1,3 +1,2 @@
-*.css
-*.swp
-.DS_Store
+node_modules
+*.sublime-workspace

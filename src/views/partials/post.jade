@@ -1,8 +1,0 @@
-h2 
-  a(href: '/' + post.slug)= post.title
-
-.post
-  p #{ post.publishDate } by #{ post.author }
-  .content!= post.content
-  .comments
-    a(href: 'http://blog.brianmavity.com/' + post.slug + '#disqus_thread') Comments
