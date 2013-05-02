@@ -13,8 +13,7 @@
   ]
 , "description": "Projection builder"
 , "dependencies": {
-		"eventemitter2": "0.4.x"
-	, "underscore": "1.4.x"
+	  "underscore": "1.4.x"
   }
 , "devDependencies": {
   }
@@ -23,10 +22,7 @@
   }
 , "keywords": [
   ]
-, "browser": {
-    "./bjorling-storage.js": "./bjorling-storage-browser.js"
-  }
 , "license": "mit +no-false-attribs, +no-advertising license"
 , "main": "./bjorling.js"
-, "version": "0.0.1"
+, "version": "0.0.2"
 }
