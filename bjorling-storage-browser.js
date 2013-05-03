@@ -1,6 +1,18 @@
 var _ = require('underscore')
-	, projections = {}
+	, events = require('eventemitter2')
 	, keys = require('./bjorling-keys')
+	, projections = {}
+
+emitter = new events.EventEmitter2()
+
+function emitUpdate(projectionName, state) {
+	process.nextTick(function() {
+		emitter.emit('updated', {
+			projection: projectionName
+		, state: state
+		})
+	})
+}
 
 function filter(projectionName, fn, cb) {
 	var projection = getProjection(projectionName)
@@ -28,11 +40,19 @@ function save(projectionName, state, cb) {
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
 	projection[key] = state
+	emitUpdate(projectionName, state)
 	cb(null)
 }
 
-module.exports = {
-	filter: filter
-, getByKey: getByKey
-, save: save
+function update(projectionName, state) {
+	var key = keys(projectionName, state)
+		, projection = getProjection(projectionName)
+	projection[key] = state
+	emitUpdate(projectionName, state)
 }
+
+module.exports = emitter
+module.exports.filter = filter
+module.exports.getByKey = getByKey
+module.exports.save = save
+module.exports.update = update

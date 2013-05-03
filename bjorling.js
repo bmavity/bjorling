@@ -2,7 +2,7 @@ var path = require('path')
 	, _ = require('underscore')
 	, handlers = {}
 	, keys = require('./bjorling-keys')
-	, storage
+	, storage = require('./bjorling-storage')
 
 function handleEvent(eventName, eventData) {
 	var matches = handlers[eventName]
@@ -56,6 +56,11 @@ module.exports.setBus = function(bus) {
 		handleEvent(this.event, eventData)
 	})
 }
-module.exports.setStore = function(store) {
-	storage = store
+module.exports.on = function() {
+	var args = [].slice.call(arguments, 0)
+	storage.on.apply(storage, args)
+}
+module.exports.update = function() {
+	var args = [].slice.call(arguments, 0)
+	storage.update.apply(storage, args)
 }
