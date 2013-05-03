@@ -36,6 +36,10 @@ function bjorling(filename) {
 		})
 	}
 
+	function getByKey(key, cb) {
+		storage.getByKey(projectionName, key, cb)
+	}
+
 	function when(handlerObj) {
 		_.forEach(handlerObj, addHandler)
 	}
@@ -45,7 +49,8 @@ function bjorling(filename) {
 	}
 
 	return {
-		when: when
+		getByKey: getByKey
+	, when: when
 	, where: where
 	}
 }
