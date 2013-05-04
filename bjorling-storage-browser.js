@@ -44,6 +44,10 @@ function save(projectionName, state, cb) {
 	cb(null)
 }
 
+function setData(projectionName, data) {
+	projections[projectionName] = data
+}
+
 function update(projectionName, state) {
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
@@ -55,4 +59,5 @@ module.exports = emitter
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.save = save
+module.exports.setData = setData
 module.exports.update = update

@@ -31,8 +31,13 @@ function save(projectionName, state, cb) {
 	cb(null)
 }
 
+function setData(projectionName, data) {
+	projections[projectionName] = data
+}
+
 module.exports = {
 	filter: filter
 , getByKey: getByKey
 , save: save
+, setData: setData
 }

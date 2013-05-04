@@ -48,10 +48,20 @@ function bjorling(filename) {
 		storage.filter(projectionName, filter, cb)
 	}
 
+	function setData(data) {
+		storage.setData(projectionName, data)
+	}
+
+	function setKey(key) {
+		keys.add(projectionName, key)
+	}
+
 	return {
 		getByKey: getByKey
 	, when: when
 	, where: where
+	, setData: setData
+	, setKey: setKey
 	}
 }
 
