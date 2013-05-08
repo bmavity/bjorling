@@ -60,7 +60,6 @@ function load(projectionName) {
 	}
 
 	process.nextTick(function() {
-		console.log(dataUrl)
 		http.get(dataUrl, { projectionName: projectionName }, handleResponse)
 	})
 }
@@ -88,6 +87,5 @@ module.exports.load = load
 module.exports.save = save
 module.exports.update = update
 module.exports.setDataLocation = function(url) {
-	console.log(url)
 	dataUrl = url
 }
