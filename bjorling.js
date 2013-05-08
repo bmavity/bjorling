@@ -2,6 +2,7 @@ var path = require('path')
 	, _ = require('underscore')
 	, handlers = {}
 	, keys = require('./bjorling-keys')
+	, filters = require('./filters')
 	, storage = require('./bjorling-storage')
 
 function handleEvent(eventName, eventData) {
@@ -11,13 +12,37 @@ function handleEvent(eventName, eventData) {
 	matches.forEach(function(match) {
 		var projectionName = match.projection
 			, key = keys(projectionName, eventData)
-		storage.getByKey(projectionName, key, function(err, state) {
+
+		function executeHandler(projectionName, state) {
 			state = state || {}
 			match.fn(state, eventData)
 			storage.save(projectionName, state, function(err) {
-				console.log(err)
+				if(err) console.log(err)
 			})
-		})
+		}
+
+		function processByFilter(projectionName, filter) {
+			storage.filter(projectionName, filter, function(err, state) {
+				console.log(state)
+				if(err) return err
+				executeHandler(projectionName, state)
+			})
+		}
+
+		function processByKey(projectionName, key) {
+			storage.getByKey(projectionName, key, function(err, state) {
+				if(err) return err
+				executeHandler(projectionName, state)
+			})
+		}
+
+		if(key) {
+			return processByKey(projectionName, key, eventData)
+		}
+		var filter = filters(projectionName, eventData)	
+		if(filter) {
+			return processByFilter(projectionName, filter)
+		}
 	})
 }
 
@@ -25,10 +50,6 @@ function bjorling(filename) {
 	var projectionName = path.basename(filename, path.extname(filename))
  
 	function addHandler(fn, name) {
-		if(keys.isKey(name)) {
-			keys.add(projectionName, fn)
-			return
-		}
 		var handler = handlers[name] = handlers[name] || []
 		handler.push({
 			projection: projectionName
@@ -52,6 +73,10 @@ function bjorling(filename) {
 		storage.filter(projectionName, filter, cb)
 	}
 
+	function setFilter(key, filter) {
+		filters.add(projectionName, key, filter)
+	}
+
 	function setKey(key) {
 		keys.add(projectionName, key)
 	}
@@ -62,6 +87,7 @@ function bjorling(filename) {
 	, when: when
 	, where: where
 	, setKey: setKey
+	, setFilter: setFilter
 	}
 }
 
