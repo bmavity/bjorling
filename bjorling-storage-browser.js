@@ -1,7 +1,9 @@
 var _ = require('underscore')
 	, events = require('eventemitter2')
 	, keys = require('./bjorling-keys')
+	, http = require('./http')
 	, projections = {}
+	, dataUrl
 
 emitter = new events.EventEmitter2()
 
@@ -36,16 +38,39 @@ function getByKey(projectionName, key, cb) {
 	})
 }
 
+function getByKeySync(projectionName, key) {
+	return getProjection(projectionName)[key]
+}
+
+function load(projectionName) {
+	function handleResponse(res) {
+		var resData = ''
+
+		res.on('data', function(data) {
+			resData += data
+		})
+
+		res.on('error', function(err) {
+			console.log('error', err)
+		})
+		
+		res.on('end', function() {
+			projection[projectionName] == resData && JSON.parse(resData)
+		})
+	}
+
+	process.nextTick(function() {
+		console.log(dataUrl)
+		http.get(dataUrl, { projectionName: projectionName }, handleResponse)
+	})
+}
+
 function save(projectionName, state, cb) {
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
 	projection[key] = state
 	emitUpdate(projectionName, state)
 	cb(null)
-}
-
-function setData(projectionName, data) {
-	projections[projectionName] = data
 }
 
 function update(projectionName, state) {
@@ -58,6 +83,11 @@ function update(projectionName, state) {
 module.exports = emitter
 module.exports.filter = filter
 module.exports.getByKey = getByKey
+module.exports.getByKeySync = getByKeySync
+module.exports.load = load
 module.exports.save = save
-module.exports.setData = setData
 module.exports.update = update
+module.exports.setDataLocation = function(url) {
+	console.log(url)
+	dataUrl = url
+}
