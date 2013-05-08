@@ -15,10 +15,6 @@ function filter(projectionName, fn, cb) {
 	})
 }
 
-function load(projectionName) {
-	projections[projectionName] = require(path.resolve(dataDir, projectionName))
-}
-
 function getProjection(projectionName) {
 	return projections[projectionName] = projections[projectionName] || {}
 }
@@ -32,6 +28,10 @@ function getByKey(projectionName, key, cb) {
 
 function getByKeySync(projectionName, key) {
 	return getProjection(projectionName)[key]
+}
+
+function load(projectionName) {
+	projections[projectionName] = require(path.resolve(dataDir, projectionName))
 }
 
 function save(projectionName, state, cb) {
