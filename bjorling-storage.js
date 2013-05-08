@@ -44,6 +44,7 @@ function save(projectionName, state, cb) {
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
+module.exports.getProjection = getProjection
 module.exports.load = load
 module.exports.save = save
 module.exports.setDataLocation = function(dir) {

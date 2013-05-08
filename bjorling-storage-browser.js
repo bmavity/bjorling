@@ -55,7 +55,7 @@ function load(projectionName) {
 		})
 		
 		res.on('end', function() {
-			projection[projectionName] == resData && JSON.parse(resData)
+			projections[projectionName] == resData && JSON.parse(resData)
 		})
 	}
 
