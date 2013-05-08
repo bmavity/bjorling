@@ -30,6 +30,10 @@ function getByKey(projectionName, key, cb) {
 	})
 }
 
+function getByKeySync(projectionName, key) {
+	return getProjection(projectionName)[key]
+}
+
 function save(projectionName, state, cb) {
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
@@ -40,6 +44,7 @@ function save(projectionName, state, cb) {
 module.exports = {
 	filter: filter
 , getByKey: getByKey
+, getByKeySync: getByKeySync
 , load: load
 , save: save
 }

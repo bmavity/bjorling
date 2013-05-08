@@ -5,6 +5,10 @@ var path = require('path')
 	, filters = require('./filters')
 	, storage = require('./bjorling-storage')
 
+function join(projectionName, key) {
+	return storage.getByKeySync(projectionName, key)
+}
+
 function handleEvent(eventName, eventData) {
 	var matches = handlers[eventName]
 	if(!matches) return
@@ -15,7 +19,7 @@ function handleEvent(eventName, eventData) {
 
 		function executeHandler(projectionName, state) {
 			state = state || {}
-			match.fn(state, eventData)
+			match.fn.call(join, state, eventData)
 			storage.save(projectionName, state, function(err) {
 				if(err) console.log(err)
 			})
@@ -23,7 +27,6 @@ function handleEvent(eventName, eventData) {
 
 		function processByFilter(projectionName, filter) {
 			storage.filter(projectionName, filter, function(err, state) {
-				console.log(state)
 				if(err) return err
 				executeHandler(projectionName, state)
 			})

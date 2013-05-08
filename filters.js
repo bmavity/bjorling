@@ -14,7 +14,6 @@ function getFilter(projectionName, evt) {
 	if(!keyVal) return
 
 	return function(s) {
-		console.log(keyVal, s)
 		return filter.fn(keyVal, s)
 	}
 }
