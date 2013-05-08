@@ -40,6 +40,10 @@ function bjorling(filename) {
 		storage.getByKey(projectionName, key, cb)
 	}
 
+	function load() {
+		storage.load(projectionName)
+	}
+
 	function when(handlerObj) {
 		_.forEach(handlerObj, addHandler)
 	}
@@ -48,19 +52,15 @@ function bjorling(filename) {
 		storage.filter(projectionName, filter, cb)
 	}
 
-	function setData(data) {
-		storage.setData(projectionName, data)
-	}
-
 	function setKey(key) {
 		keys.add(projectionName, key)
 	}
 
 	return {
 		getByKey: getByKey
+	, load: load
 	, when: when
 	, where: where
-	, setData: setData
 	, setKey: setKey
 	}
 }
@@ -78,4 +78,8 @@ module.exports.on = function() {
 module.exports.update = function() {
 	var args = [].slice.call(arguments, 0)
 	storage.update.apply(storage, args)
+}
+module.exports.setDataLocation = function() {
+	var args = [].slice.call(arguments, 0)
+	storage.setDataLocation.apply(storage, args)
 }

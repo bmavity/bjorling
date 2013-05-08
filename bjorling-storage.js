@@ -1,6 +1,8 @@
 var _ = require('underscore')
+	, path = require('path')
 	, projections = {}
 	, keys = require('./bjorling-keys')
+	, dataDir
 
 function filter(projectionName, fn, cb) {
 	var projection = getProjection(projectionName)
@@ -11,6 +13,10 @@ function filter(projectionName, fn, cb) {
 	process.nextTick(function() {
 		cb(null, result[0])
 	})
+}
+
+function load(projectionName) {
+	projections[projectionName] = require(path.resolve(dataDir, projectionName))
 }
 
 function getProjection(projectionName) {
@@ -31,13 +37,12 @@ function save(projectionName, state, cb) {
 	cb(null)
 }
 
-function setData(projectionName, data) {
-	projections[projectionName] = data
-}
-
 module.exports = {
 	filter: filter
 , getByKey: getByKey
+, load: load
 , save: save
-, setData: setData
+}
+module.exports.setDataLocation = function(dir) {
+	dataDir = dir
 }
