@@ -19,11 +19,10 @@ function emitUpdate(projectionName, state) {
 function filter(projectionName, fn, cb) {
 	var projection = getProjection(projectionName)
 	var result = _.filter(projection, function(state, key) {
-		if(keys.isKey(key)) return false
 		return fn(state)
-	})
+	})[0]
 	process.nextTick(function() {
-		cb(null, result[0])
+		cb(null, result)
 	})
 }
 
@@ -55,7 +54,7 @@ function load(projectionName) {
 		})
 		
 		res.on('end', function() {
-			projections[projectionName] == resData && JSON.parse(resData)
+			projections[projectionName] = resData && JSON.parse(resData)
 		})
 	}
 
@@ -73,6 +72,8 @@ function save(projectionName, state, cb) {
 }
 
 function update(projectionName, state) {
+	if(!state) return
+
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
 	projection[key] = state
