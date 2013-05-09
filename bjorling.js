@@ -117,3 +117,8 @@ module.exports.getProjection = function(projectionName, cb) {
 		cb(null, storage.getProjection(projectionName))
 	})
 }
+module.exports.get = function(projectionName, key, cb) {
+	process.nextTick(function() {
+		storage.getByKey(projectionName, key, cb)
+	})
+}
