@@ -3,6 +3,7 @@ var _ = require('underscore')
 	, keys = require('./bjorling-keys')
 	, http = require('./http')
 	, projections = {}
+	, projectionDataLocations = {}
 	, dataUrl
 
 emitter = new events.EventEmitter2()
@@ -32,9 +33,34 @@ function getProjection(projectionName) {
 
 function getByKey(projectionName, key, cb) {
 	var projection = getProjection(projectionName)
-	process.nextTick(function() {
-		cb(null, projection[key])
-	})
+		, val = projection[key]
+
+	function handleResponse(res) {
+		res.on('end', function(resData) {
+			if(!resData) return
+
+			projection[key] = resData
+			cb(null, resData)
+		})
+	}
+
+	function immediateResult() {
+		process.nextTick(function() {
+			cb(null, val)
+		})
+	}
+
+	function retrieveResult() {
+		var dataLocation = projectionDataLocations[projectionName]
+			, keyObj = keys.getObj(projectionName, key)
+		http[dataLocation.method](dataLocation.action, keyObj, handleResponse)
+	}
+
+	if(val) {
+		immediateResult()
+	} else {
+		retrieveResult()
+	}
 }
 
 function getByKeySync(projectionName, key) {
@@ -43,24 +69,12 @@ function getByKeySync(projectionName, key) {
 
 function load(projectionName) {
 	function handleResponse(res) {
-		var resData = ''
-
-		res.on('data', function(data) {
-			resData += data
-		})
-
-		res.on('error', function(err) {
-			console.log('error', err)
-		})
-		
-		res.on('end', function() {
-			projections[projectionName] = resData && JSON.parse(resData)
+		res.on('end', function(resData) {
+			projections[projectionName] = resData
 		})
 	}
 
-	process.nextTick(function() {
-		http.get(dataUrl, { projectionName: projectionName }, handleResponse)
-	})
+	http.get(dataUrl, { projectionName: projectionName }, handleResponse)
 }
 
 function save(projectionName, state, cb) {
@@ -69,6 +83,13 @@ function save(projectionName, state, cb) {
 	projection[key] = state
 	emitUpdate(projectionName, state)
 	cb(null)
+}
+
+function setProjectionDataLocation(projectionName, method, action) {
+	projectionDataLocations[projectionName] = {
+		method: method
+	, action: action
+	}
 }
 
 function update(projectionName, state) {
@@ -86,7 +107,9 @@ module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
 module.exports.load = load
 module.exports.save = save
+module.exports.setProjectionDataLocation = setProjectionDataLocation
 module.exports.update = update
 module.exports.setDataLocation = function(url) {
+	console.log(url)
 	dataUrl = url
 }

@@ -108,10 +108,6 @@ module.exports.update = function() {
 	var args = [].slice.call(arguments, 0)
 	storage.update.apply(storage, args)
 }
-module.exports.setDataLocation = function() {
-	var args = [].slice.call(arguments, 0)
-	storage.setDataLocation.apply(storage, args)
-}
 module.exports.getProjection = function(projectionName, cb) {
 	process.nextTick(function() {
 		cb(null, storage.getProjection(projectionName))
@@ -122,3 +118,4 @@ module.exports.get = function(projectionName, key, cb) {
 		storage.getByKey(projectionName, key, cb)
 	})
 }
+module.exports.storage = storage
