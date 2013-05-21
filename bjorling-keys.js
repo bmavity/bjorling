@@ -20,7 +20,7 @@ function createSingleNameKeyFn(key) {
 }
 
 function createSingleNameKeyObjFn(key) {
-	return function(keyObj) {
+	return function(val) {
 		var keyObj = {}
 		keyObj[key] = val
 		return keyObj
@@ -36,12 +36,12 @@ function isKey(name) {
 }
 
 function getObj(projectionName, key) {
-	return keys[projectionName](obj)
+	return keys[projectionName].from(key)
 }
 
 
 function getKey(projectionName, obj) {
-	return keys[projectionName](obj)
+	return keys[projectionName].to(obj)
 }
 
 

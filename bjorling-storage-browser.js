@@ -4,67 +4,82 @@ var _ = require('underscore')
 	, http = require('./http')
 	, projections = {}
 	, projectionDataLocations = {}
+	, notFounds = {}
 	, dataUrl
 
 emitter = new events.EventEmitter2()
 
-function emitUpdate(projectionName, state) {
+function createFilterFn(filterObj) {
+	return function(state) {
+		return _.every(filterObj, function(val, name) {
+			return state[name] === val
+		})
+	}
+}
+
+function emitUpdate(projectionName, state, isNewState) {
 	process.nextTick(function() {
-		emitter.emit('updated', {
+		emitter.emit('projection updated', {
 			projection: projectionName
+		, isNew: isNewState
 		, state: state
 		})
 	})
 }
 
-function filter(projectionName, fn, cb) {
+function processQuery(projectionName, queriedValue, data, cb) {
+	if(queriedValue) {
+		immediateResult(projectionName, queriedValue, cb)
+	} else {
+		retrieveResult(projectionName, data, cb)
+	}	
+}
+
+function filter(projectionName, filterObj, cb) {
 	var projection = getProjection(projectionName)
-	var result = _.filter(projection, function(state, key) {
-		return fn(state)
-	})[0]
-	process.nextTick(function() {
-		cb(null, result)
-	})
+		, filterFn = isFunction(filterObj) ? filterObj : createFilterFn(filterObj)
+		, result = _.filter(projection, function(state, key) {
+				return filterFn(state)
+			})[0]
+
+	processQuery(projectionName, result, filterObj, cb)
+}
+
+function getByKey(projectionName, key, cb) {
+	var projection = getProjection(projectionName)
+		, val = projection[key]
+		, keyObj = keys.getObj(projectionName, key)
+
+	processQuery(projectionName, val, keyObj, cb)
+}
+
+function getByKeySync(projectionName, key) {
+	return getProjection(projectionName)[key]
 }
 
 function getProjection(projectionName) {
 	return projections[projectionName] = projections[projectionName] || {}
 }
 
-function getByKey(projectionName, key, cb) {
+function getState(projectionName, keyOrFilter, cb) {
 	var projection = getProjection(projectionName)
-		, val = projection[key]
-
-	function handleResponse(res) {
-		res.on('end', function(resData) {
-			if(!resData) return
-
-			projection[key] = resData
-			cb(null, resData)
-		})
-	}
-
-	function immediateResult() {
-		process.nextTick(function() {
-			cb(null, val)
-		})
-	}
-
-	function retrieveResult() {
-		var dataLocation = projectionDataLocations[projectionName]
-			, keyObj = keys.getObj(projectionName, key)
-		http[dataLocation.method](dataLocation.action, keyObj, handleResponse)
-	}
-
-	if(val) {
-		immediateResult()
+		, val
+	if(isFunction(keyOrFilter)) {
+		val = resolveFilter(projection, keyOrFilter)
 	} else {
-		retrieveResult()
+		val = projection[keyOrFilter]
 	}
+	return val
 }
 
-function getByKeySync(projectionName, key) {
-	return getProjection(projectionName)[key]
+function isFunction(obj) {
+  return Object.prototype.toString.call(obj) === '[object Function]'
+}
+
+function immediateResult(projectionName, val, cb) {
+	process.nextTick(function() {
+		cb(null, val)
+	})
 }
 
 function load(projectionName) {
@@ -77,11 +92,51 @@ function load(projectionName) {
 	http.get(dataUrl, { projectionName: projectionName }, handleResponse)
 }
 
+function retrieveResult(projectionName, data, cb) {
+	var dataLocation = projectionDataLocations[projectionName]
+		, url = http.getUrl(dataLocation.action, data)
+
+	function handleResponse(res) {
+		res.on('end', function(resData) {
+			if(!resData) {
+				notFounds[url] = true
+				return cb(null, null)
+			}
+
+			var key = keys(projectionName, resData)
+				, projection = getProjection(projectionName)
+
+			if(!key) return cb({ message: 'Response data has no key value' })
+
+			projection[key] = resData
+			cb(null, resData)
+		})
+	}
+
+	if(notFounds[url]) {
+		return cb(null, null)
+	}
+
+	http[dataLocation.method](dataLocation.action, data, handleResponse)
+}
+
+function isNew(projection, key) {
+	return !projection[key]
+}
+
+function resolveFilter(projection, filterFn) {
+	return _.filter(projection, function(state, key) {
+		return filterFn(state)
+	})[0]
+}
+
 function save(projectionName, state, cb) {
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
+		, isNewState = isNew(projection, key)
+
 	projection[key] = state
-	emitUpdate(projectionName, state)
+	emitUpdate(projectionName, state, isNewState)
 	cb(null)
 }
 
@@ -92,24 +147,14 @@ function setProjectionDataLocation(projectionName, method, action) {
 	}
 }
 
-function update(projectionName, state) {
-	if(!state) return
-
-	var key = keys(projectionName, state)
-		, projection = getProjection(projectionName)
-	projection[key] = state
-	emitUpdate(projectionName, state)
-}
-
 module.exports = emitter
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
+module.exports.getState = getState
 module.exports.load = load
 module.exports.save = save
 module.exports.setProjectionDataLocation = setProjectionDataLocation
-module.exports.update = update
 module.exports.setDataLocation = function(url) {
-	console.log(url)
 	dataUrl = url
 }

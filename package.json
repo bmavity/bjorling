@@ -14,6 +14,7 @@
 , "description": "Projection builder"
 , "dependencies": {
 		"eventemitter2": "0.4.x"
+ 	, "sarastro": "0.0.x"
  	, "underscore": "1.4.x"
   }
 , "devDependencies": {
@@ -28,5 +29,5 @@
   }
 , "license": "mit +no-false-attribs, +no-advertising license"
 , "main": "./bjorling.js"
-, "version": "0.1.1"
+, "version": "0.2.0"
 }

@@ -25,26 +25,13 @@ function handleEvent(eventName, eventData) {
 			})
 		}
 
-		function processByFilter(projectionName, filter) {
-			storage.filter(projectionName, filter, function(err, state) {
-				if(err) return err
-				executeHandler(projectionName, state)
-			})
-		}
-
-		function processByKey(projectionName, key) {
-			storage.getByKey(projectionName, key, function(err, state) {
-				if(err) return err
-				executeHandler(projectionName, state)
-			})
-		}
-
 		if(key) {
-			return processByKey(projectionName, key, eventData)
+			return executeHandler(projectionName, storage.getState(projectionName, key))
 		}
+
 		var filter = filters(projectionName, eventData)	
 		if(filter) {
-			return processByFilter(projectionName, filter)
+			return executeHandler(projectionName, storage.getState(projectionName, filter))
 		}
 	})
 }
@@ -72,12 +59,12 @@ function bjorling(filename) {
 		_.forEach(handlerObj, addHandler)
 	}
 
-	function where(filter, cb) {
-		storage.filter(projectionName, filter, cb)
+	function where(filterObj, cb) {
+		storage.filter(projectionName, filterObj, cb)
 	}
 
-	function setFilter(key, filter) {
-		filters.add(projectionName, key, filter)
+	function setFilter(filter) {
+		filters.add(projectionName, filter)
 	}
 
 	function setKey(key) {
@@ -103,10 +90,6 @@ module.exports.setBus = function(bus) {
 module.exports.on = function() {
 	var args = [].slice.call(arguments, 0)
 	storage.on.apply(storage, args)
-}
-module.exports.update = function() {
-	var args = [].slice.call(arguments, 0)
-	storage.update.apply(storage, args)
 }
 module.exports.getProjection = function(projectionName, cb) {
 	process.nextTick(function() {
