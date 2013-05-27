@@ -1,31 +1,51 @@
 var sarastro = require('sarastro')
-	, filters = {}
+	, allFilters = {}
+
+function getFilters(projectionName) {
+	return allFilters[projectionName] = allFilters[projectionName] || []
+}
 
 function add(projectionName, filter) {
 	var args = sarastro(filter)
+		, filters = getFilters(projectionName)
 	args.pop()
 
-	filters[projectionName] = {
+	filters.push({
 		args: args
 	, fn: filter
-	}
+	})
 }
 
-function getFilter(projectionName, evt) {
-	var getVal = function(name) {
+function applyFilter(projectionName, evt) {
+	var filters = getFilters(projectionName)
+		, argVals
+		, selectedFilter
+
+	function getVal(name) {
 		return evt[name]
 	}
 
-	var filter = filters[projectionName]
-	if(!filter) return
-	var argVals = filter.args.map(getVal)
-	if(!argVals) return
+	function hasNoArgValue(argVal) {
+		return !argVal
+	}
+
+	function hasAllArgVals(filter) {
+		argVals = filter.args.map(getVal)
+		if(argVals.some(hasNoArgValue)) return
+
+		selectedFilter = filter
+		return true
+	}
+
+	if(!filters) return
+	if(!filters.some(hasAllArgVals)) return
+
 
 	return function(s) {
-		return filter.fn.apply({}, argVals.concat(s))
+		return selectedFilter.fn.apply({}, argVals.concat(s))
 	}
 }
 
 
-module.exports = getFilter
+module.exports = applyFilter
 module.exports.add = add

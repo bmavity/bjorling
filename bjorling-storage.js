@@ -6,9 +6,7 @@ var _ = require('underscore')
 
 function createFilterFn(filterObj) {
 	return function(state) {
-		console.log(filterObj)
 		return _.every(filterObj, function(val, name) {
-			console.log(name, val, state[name])
 			return state[name] === val
 		})
 	}
@@ -20,9 +18,9 @@ function filter(projectionName, filterObj, cb) {
 	var result = _.filter(projection, function(state, key) {
 		return filterFn(state)
 	})
-	console.log(result[0])
 	process.nextTick(function() {
-		cb(null, result[0])
+		if(result.length < 2) result = result[0]
+		cb(null, result)
 	})
 }
 
@@ -62,7 +60,6 @@ function load(projectionName) {
 
 function resolveFilter(projection, filterFn) {
 	return _.filter(projection, function(state, key) {
-		console.log(state)
 		return filterFn(state)
 	})[0]
 }
@@ -71,7 +68,6 @@ function save(projectionName, state, cb) {
 	var key = keys(projectionName, state)
 		, projection = getProjection(projectionName)
 	projection[key] = state
-	console.log(projectionName, projection)
 	cb(null)
 }
 
