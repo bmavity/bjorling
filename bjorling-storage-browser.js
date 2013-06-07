@@ -92,6 +92,12 @@ function load(projectionName) {
 	http.get(dataUrl, { projectionName: projectionName }, handleResponse)
 }
 
+function remove(projectionName, state) {
+	var key = keys(projectionName, state)
+		, projection = getProjection(projectionName)
+	delete projection[key]
+}
+
 function retrieveResult(projectionName, data, cb) {
 	var dataLocation = projectionDataLocations[projectionName]
 		, url = http.getUrl(dataLocation.action, data)
@@ -153,6 +159,7 @@ module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
 module.exports.getState = getState
 module.exports.load = load
+module.exports.remove = remove
 module.exports.save = save
 module.exports.setProjectionDataLocation = setProjectionDataLocation
 module.exports.setDataLocation = function(url) {

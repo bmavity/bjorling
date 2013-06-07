@@ -18,8 +18,19 @@ function handleEvent(eventName, eventData) {
 			, key = keys(projectionName, eventData)
 
 		function executeHandler(projectionName, state) {
+			var context = {
+				join: join
+			, remove: remove
+			}
+
+			function remove() {
+				storage.remove(projectionName, state)
+			}
+
 			state = state || {}
-			match.fn.call(join, state, eventData)
+
+			match.fn.call(context, state, eventData)
+
 			storage.save(projectionName, state, function(err) {
 				if(err) console.log(err)
 			})

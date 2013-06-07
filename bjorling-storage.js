@@ -58,6 +58,12 @@ function load(projectionName) {
 	projections[projectionName] = require(path.resolve(dataDir, projectionName))
 }
 
+function remove(projectionName, state) {
+	var key = keys(projectionName, state)
+		, projection = getProjection(projectionName)
+	delete projection[key]
+}
+
 function resolveFilter(projection, filterFn) {
 	return _.filter(projection, function(state, key) {
 		return filterFn(state)
@@ -77,6 +83,7 @@ module.exports.getByKeySync = getByKeySync
 module.exports.getProjection = getProjection
 module.exports.getState = getState
 module.exports.load = load
+module.exports.remove = remove
 module.exports.save = save
 module.exports.setDataLocation = function(dir) {
 	dataDir = dir
