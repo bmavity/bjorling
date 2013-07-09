@@ -4,6 +4,7 @@ var path = require('path')
 	, keys = require('./bjorling-keys')
 	, filters = require('./filters')
 	, storage = require('./bjorling-storage')
+	, subscriptionFactory
 
 function join(projectionName, key) {
 	return storage.getByKeySync(projectionName, key)
@@ -47,52 +48,50 @@ function handleEvent(eventName, eventData) {
 	})
 }
 
-function bjorling(filename) {
-	var projectionName = path.basename(filename, path.extname(filename))
- 
-	function addHandler(fn, name) {
-		var handler = handlers[name] = handlers[name] || []
-		handler.push({
-			projection: projectionName
-		, fn: fn
-		})
+function Bjorling(filename) {
+	if(!(this instanceof Bjorling)) {
+		return new Bjorling(filename)
 	}
-
-	function getByKey(key, cb) {
-		storage.getByKey(projectionName, key, cb)
-	}
-
-	function load() {
-		storage.load(projectionName)
-	}
-
-	function when(handlerObj) {
-		_.forEach(handlerObj, addHandler)
-	}
-
-	function where(filterObj, cb) {
-		storage.filter(projectionName, filterObj, cb)
-	}
-
-	function setFilter(filter) {
-		filters.add(projectionName, filter)
-	}
-
-	function setKey(key) {
-		keys.add(projectionName, key)
-	}
-
-	return {
-		getByKey: getByKey
-	, load: load
-	, when: when
-	, where: where
-	, setKey: setKey
-	, setFilter: setFilter
-	}
+	this._projectionName = path.basename(filename, path.extname(filename))
 }
 
-module.exports = bjorling
+Bjorling.prototype.addHandler = function(fn, name) {
+	var handler = handlers[name] = handlers[name] || []
+	handler.push({
+		projection: this._projectionName
+	, fn: fn
+	})
+}
+
+Bjorling.prototype.getByKey = function(key, cb) {
+	storage.getByKey(this._projectionName, key, cb)
+}
+
+Bjorling.prototype.load = function() {
+	storage.load(this._projectionName)
+}
+
+Bjorling.prototype.when = function(handlerObj) {
+	var me = this
+	_.forEach(handlerObj, function(fn, name) {
+		me.addHandler(fn, name)
+	})
+}
+
+Bjorling.prototype.where = function(filterObj, cb) {
+	storage.filter(this._projectionName, filterObj, cb)
+}
+
+Bjorling.prototype.setFilter = function(filter) {
+	filters.add(this._projectionName, filter)
+}
+
+Bjorling.prototype.setKey = function(key) {
+	keys.add(this._projectionName, key)
+}
+
+
+module.exports = Bjorling
 module.exports.setBus = function(bus) {
 	bus.subscribe('*', function(eventData) {
 		handleEvent(this.event, eventData)
@@ -101,6 +100,9 @@ module.exports.setBus = function(bus) {
 module.exports.on = function() {
 	var args = [].slice.call(arguments, 0)
 	storage.on.apply(storage, args)
+}
+module.exports.init = function(opts) {
+	subscriptionFactory = opts.subscriptionFactory
 }
 module.exports.getProjection = function(projectionName, cb) {
 	process.nextTick(function() {
