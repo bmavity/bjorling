@@ -1,6 +1,9 @@
 var _ = require('underscore')
+	, fs = require('fs')
 	, path = require('path')
+	, afs = new (require('atomic-write').Context)
 	, projections = {}
+	, positions = {}
 	, keys = require('./bjorling-keys')
 	, dataDir
 
@@ -34,7 +37,6 @@ function getByKey(projectionName, key, cb) {
 		cb(null, projection[key])
 	})
 }
-
 function getByKeySync(projectionName, key) {
 	return getProjection(projectionName)[key]
 }
@@ -55,7 +57,7 @@ function isFunction(obj) {
 }
 
 function load(projectionName) {
-	projections[projectionName] = require(path.resolve(dataDir, projectionName))
+	projections[projectionName] = require(getProjectionFile(projectionName))
 }
 
 function remove(projectionName, state) {
@@ -77,6 +79,42 @@ function save(projectionName, state, cb) {
 	cb(null)
 }
 
+function getProjectionFile(projectionName) {
+	return path.resolve(dataDir, projectionName + '.json')
+}
+
+function eventResult(projectionName, eventPosition, state, cb) {
+	var key = keys(projectionName, state)
+		, projection = getProjection(projectionName)
+	projection[key] = state
+	positions[projectionName] = eventPosition
+	cb(null)
+}
+
+function persistState(projectionState, projectionName) {
+	var projectionFile = getProjectionFile(projectionName)
+	fs.readFile(projectionFile, 'utf8', function(err, file) {
+		var persistedProjection = !!err ? { lastProcessedPosition: -1 } : JSON.parse(file)
+			, lastProcessedPosition = positions[projectionName]
+		if(lastProcessedPosition > persistedProjection.lastProcessedPosition) {
+			persistedProjection.lastProcessedPosition = lastProcessedPosition
+			persistedProjection.state = projectionState
+			afs.writeFile(projectionFile, JSON.stringify(persistedProjection), function(err) {
+				if(err) return console.error(err)
+			})
+		}
+	})
+}
+
+function persistAllState() {
+	_.forEach(projections, persistState)
+}
+
+
+setTimeout(persistAllState, 5000)
+
+
+module.exports.eventResult = eventResult
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync

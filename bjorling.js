@@ -4,63 +4,54 @@ var path = require('path')
 	, keys = require('./bjorling-keys')
 	, filters = require('./filters')
 	, storage = require('./bjorling-storage')
+	, dataDir
 	, subscriptionFactory
 
 function join(projectionName, key) {
 	return storage.getByKeySync(projectionName, key)
 }
 
-function handleEvent(eventName, eventData) {
-	var matches = handlers[eventName]
-	if(!matches) return
-
-	matches.forEach(function(match) {
-		var projectionName = match.projection
-			, key = keys(projectionName, eventData)
-
-		function executeHandler(projectionName, state) {
-			var context = {
-				join: join
-			, remove: remove
-			}
-
-			function remove() {
-				storage.remove(projectionName, state)
-			}
-
-			state = state || {}
-
-			match.fn.call(context, state, eventData)
-
-			storage.save(projectionName, state, function(err) {
-				if(err) console.log(err)
-			})
-		}
-
-		if(key) {
-			return executeHandler(projectionName, storage.getState(projectionName, key))
-		}
-
-		var filter = filters(projectionName, eventData)	
-		if(filter) {
-			return executeHandler(projectionName, storage.getState(projectionName, filter))
-		}
-	})
-}
-
 function Bjorling(filename) {
 	if(!(this instanceof Bjorling)) {
 		return new Bjorling(filename)
 	}
+
 	this._projectionName = path.basename(filename, path.extname(filename))
+	this._handlers = {}
+	this._subscription = subscriptionFactory()
 }
 
-Bjorling.prototype.addHandler = function(fn, name) {
-	var handler = handlers[name] = handlers[name] || []
-	handler.push({
-		projection: this._projectionName
-	, fn: fn
-	})
+Bjorling.prototype.execute = function(handler, eventData, position) {
+	var projectionName = this._projectionName
+		, key = keys(projectionName, eventData)
+
+	function executeHandler(projectionName, state) {
+		var context = {
+			join: join
+		, remove: remove
+		}
+
+		function remove() {
+			storage.remove(projectionName, state)
+		}
+
+		state = state || {}
+
+		handler.call(context, state, eventData)
+
+		storage.eventResult(projectionName, position, state, function(err) {
+			if(err) console.log(err)
+		})
+	}
+
+	if(key) {
+		return executeHandler(projectionName, storage.getState(projectionName, key))
+	}
+
+	var filter = filters(projectionName, eventData)	
+	if(filter) {
+		return executeHandler(projectionName, storage.getState(projectionName, filter))
+	}
 }
 
 Bjorling.prototype.getByKey = function(key, cb) {
@@ -72,10 +63,7 @@ Bjorling.prototype.load = function() {
 }
 
 Bjorling.prototype.when = function(handlerObj) {
-	var me = this
-	_.forEach(handlerObj, function(fn, name) {
-		me.addHandler(fn, name)
-	})
+	this._handlers = handlerObj
 }
 
 Bjorling.prototype.where = function(filterObj, cb) {
@@ -90,13 +78,19 @@ Bjorling.prototype.setKey = function(key) {
 	keys.add(this._projectionName, key)
 }
 
-
-module.exports = Bjorling
-module.exports.setBus = function(bus) {
-	bus.subscribe('*', function(eventData) {
-		handleEvent(this.event, eventData)
+Bjorling.prototype.start = function() {
+	var sub = this._subscription.replay()
+		, me = this
+	sub.on('event', function(evt) {
+		var handler = me._handlers[evt.__type]
+		if(handler) {
+			me.execute(handler, evt.evt, evt.position)
+		}
 	})
 }
+
+
+module.exports = Bjorling
 module.exports.on = function() {
 	var args = [].slice.call(arguments, 0)
 	storage.on.apply(storage, args)
