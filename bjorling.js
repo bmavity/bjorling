@@ -79,13 +79,17 @@ Bjorling.prototype.setKey = function(key) {
 }
 
 Bjorling.prototype.start = function() {
-	var sub = this._subscription.replay()
-		, me = this
-	sub.on('event', function(evt) {
-		var handler = me._handlers[evt.__type]
-		if(handler) {
-			me.execute(handler, evt.evt, evt.position)
-		}
+	var me = this
+
+	storage.initialLoad(this._projectionName, function(err, lastProcessedPosition) {
+		console.log(me._projectionName, lastProcessedPosition)
+		var sub = me._subscription.replay(lastProcessedPosition + 1)
+		sub.on('event', function(evt) {
+			var handler = me._handlers[evt.__type]
+			if(handler) {
+				me.execute(handler, evt.evt, evt.position)
+			}
+		})
 	})
 }
 

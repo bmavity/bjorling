@@ -91,14 +91,22 @@ function eventResult(projectionName, eventPosition, state, cb) {
 	cb(null)
 }
 
-function persistState(projectionState, projectionName) {
+function getPersistedProjection(projectionName, cb) {
 	var projectionFile = getProjectionFile(projectionName)
 	fs.readFile(projectionFile, 'utf8', function(err, file) {
 		var persistedProjection = !!err ? { lastProcessedPosition: -1 } : JSON.parse(file)
+		cb(null, persistedProjection)
+	})
+}
+
+function persistState(projectionState, projectionName) {
+	getPersistedProjection(projectionName, function(err, persistedProjection) {
+		var projectionFile = getProjectionFile(projectionName)
 			, lastProcessedPosition = positions[projectionName]
 		if(lastProcessedPosition > persistedProjection.lastProcessedPosition) {
 			persistedProjection.lastProcessedPosition = lastProcessedPosition
 			persistedProjection.state = projectionState
+			console.log('writing updates to "' + projectionName + '"')
 			afs.writeFile(projectionFile, JSON.stringify(persistedProjection), function(err) {
 				if(err) return console.error(err)
 			})
@@ -110,8 +118,17 @@ function persistAllState() {
 	_.forEach(projections, persistState)
 }
 
+function initialLoad(projectionName, cb) {
+	getPersistedProjection(projectionName, function(err, persistedProjection) {
+		if(err) return cb(err)
+		positions[projectionName] = persistedProjection.lastProcessedPosition
+		projections[projectionName] = persistedProjection.state
+		cb(null, persistedProjection.lastProcessedPosition)
+	})
+}
 
-setTimeout(persistAllState, 5000)
+
+setInterval(persistAllState, 60000)
 
 
 module.exports.eventResult = eventResult
@@ -120,6 +137,7 @@ module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
 module.exports.getProjection = getProjection
 module.exports.getState = getState
+module.exports.initialLoad = initialLoad
 module.exports.load = load
 module.exports.remove = remove
 module.exports.save = save
