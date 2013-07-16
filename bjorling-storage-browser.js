@@ -1,10 +1,10 @@
 var _ = require('underscore')
 	, events = require('eventemitter2')
 	, keys = require('./bjorling-keys')
-	, http = require('./http')
 	, projections = {}
 	, projectionDataLocations = {}
 	, notFounds = {}
+	, http
 	, dataUrl
 
 emitter = new events.EventEmitter2()
@@ -28,6 +28,7 @@ function emitUpdate(projectionName, state, isNewState) {
 }
 
 function processQuery(projectionName, queriedValue, data, cb) {
+	console.log(arguments)
 	if(queriedValue) {
 		immediateResult(projectionName, queriedValue, cb)
 	} else {
@@ -82,6 +83,12 @@ function immediateResult(projectionName, val, cb) {
 	})
 }
 
+function initialLoad(projectionName, cb) {
+	process.nextTick(function() {
+		cb(null, 0)
+	})
+}
+
 function load(projectionName) {
 	function handleResponse(res) {
 		res.on('end', function(resData) {
@@ -101,7 +108,7 @@ function remove(projectionName, state) {
 function retrieveResult(projectionName, data, cb) {
 	var dataLocation = projectionDataLocations[projectionName]
 		, url = http.getUrl(dataLocation.action, data)
-
+		
 	function handleResponse(res) {
 		res.on('end', function(resData) {
 			if(!resData) {
@@ -153,15 +160,24 @@ function setProjectionDataLocation(projectionName, method, action) {
 	}
 }
 
+function eventResult(projectionName, position, state, cb) {
+	save(projectionName, state, cb)
+}
+
 module.exports = emitter
+module.exports.eventResult = eventResult
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
 module.exports.getState = getState
+module.exports.initialLoad = initialLoad
 module.exports.load = load
 module.exports.remove = remove
 module.exports.save = save
 module.exports.setProjectionDataLocation = setProjectionDataLocation
 module.exports.setDataLocation = function(url) {
 	dataUrl = url
+}
+module.exports.setHttp = function(toSet) {
+	http = toSet
 }

@@ -101,6 +101,9 @@ module.exports.on = function() {
 }
 module.exports.init = function(opts) {
 	subscriptionFactory = opts.subscriptionFactory
+	if(opts.http) {
+		storage.setHttp(opts.http)
+	}
 }
 module.exports.getProjection = function(projectionName, cb) {
 	process.nextTick(function() {
