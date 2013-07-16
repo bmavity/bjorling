@@ -3,6 +3,7 @@ var _ = require('underscore')
 	, path = require('path')
 	, afs = new (require('atomic-write').Context)
 	, projections = {}
+	, indexes = {}
 	, positions = {}
 	, keys = require('./bjorling-keys')
 	, dataDir
@@ -37,8 +38,13 @@ function getByKey(projectionName, key, cb) {
 		cb(null, projection[key])
 	})
 }
+
 function getByKeySync(projectionName, key) {
 	return getProjection(projectionName)[key]
+}
+
+function getIndex(projectionName, index, key) {
+	return indexes[projectionName][index][key]
 }
 
 function getState(projectionName, keyOrFilter, cb) {
@@ -79,6 +85,12 @@ function save(projectionName, state, cb) {
 	cb(null)
 }
 
+function setIndex(projectionName, index, key, val) {
+	var i = indexes[projectionName] = indexes[projectionName] || {}
+	i[index] = i[index] || {}
+	i[index][key] = val
+}
+
 function getProjectionFile(projectionName) {
 	return path.resolve(dataDir, projectionName + '.json')
 }
@@ -106,6 +118,7 @@ function persistState(projectionState, projectionName) {
 		if(lastProcessedPosition > persistedProjection.lastProcessedPosition) {
 			persistedProjection.lastProcessedPosition = lastProcessedPosition
 			persistedProjection.state = projectionState
+			persistedProjection.indexes = indexes[projectionName] || {}
 			console.log('writing updates to "' + projectionName + '"')
 			afs.writeFile(projectionFile, JSON.stringify(persistedProjection), function(err) {
 				if(err) return console.error(err)
@@ -123,6 +136,7 @@ function initialLoad(projectionName, cb) {
 		if(err) return cb(err)
 		positions[projectionName] = persistedProjection.lastProcessedPosition
 		projections[projectionName] = persistedProjection.state
+		indexes[projectionName] = persistedProjection.indexes
 		cb(null, persistedProjection.lastProcessedPosition)
 	})
 }
@@ -135,12 +149,14 @@ module.exports.eventResult = eventResult
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
+module.exports.getIndex = getIndex
 module.exports.getProjection = getProjection
 module.exports.getState = getState
 module.exports.initialLoad = initialLoad
 module.exports.load = load
 module.exports.remove = remove
 module.exports.save = save
+module.exports.setIndex = setIndex
 module.exports.setDataLocation = function(dir) {
 	dataDir = dir
 }

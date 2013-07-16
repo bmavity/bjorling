@@ -58,6 +58,10 @@ Bjorling.prototype.getByKey = function(key, cb) {
 	storage.getByKey(this._projectionName, key, cb)
 }
 
+Bjorling.prototype.getIndex = function(index, key) {
+	return storage.getIndex(this._projectionName, index, key)
+}
+
 Bjorling.prototype.load = function() {
 	storage.load(this._projectionName)
 }
@@ -72,6 +76,10 @@ Bjorling.prototype.where = function(filterObj, cb) {
 
 Bjorling.prototype.setFilter = function(filter) {
 	filters.add(this._projectionName, filter)
+}
+
+Bjorling.prototype.setIndex = function(index, key, val) {
+	return storage.setIndex(this._projectionName, index, key, val)
 }
 
 Bjorling.prototype.setKey = function(key) {
