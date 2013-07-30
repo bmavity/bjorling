@@ -32,6 +32,15 @@ function getProjection(projectionName) {
 	return projections[projectionName] = projections[projectionName] || {}
 }
 
+function getAll(projectionName, cb) {
+	var projection = getProjection(projectionName)
+	process.nextTick(function() {
+		cb(null, _.map(projection, function(p) {
+			return p
+		}))
+	})
+}
+
 function getByKey(projectionName, key, cb) {
 	var projection = getProjection(projectionName)
 	process.nextTick(function() {
@@ -149,8 +158,9 @@ module.exports.eventResult = eventResult
 module.exports.filter = filter
 module.exports.getByKey = getByKey
 module.exports.getByKeySync = getByKeySync
-module.exports.getIndex = getIndex
 module.exports.getProjection = getProjection
+module.exports.getAll = getAll
+module.exports.getIndex = getIndex
 module.exports.getState = getState
 module.exports.initialLoad = initialLoad
 module.exports.load = load

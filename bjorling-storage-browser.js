@@ -28,7 +28,6 @@ function emitUpdate(projectionName, state, isNewState) {
 }
 
 function processQuery(projectionName, queriedValue, data, cb) {
-	console.log(arguments)
 	if(queriedValue) {
 		immediateResult(projectionName, queriedValue, cb)
 	} else {

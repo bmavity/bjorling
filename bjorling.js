@@ -54,6 +54,10 @@ Bjorling.prototype.execute = function(handler, eventData, position) {
 	}
 }
 
+Bjorling.prototype.getAll = function(cb) {
+	storage.getAll(this._projectionName, cb)
+}
+
 Bjorling.prototype.getByKey = function(key, cb) {
 	storage.getByKey(this._projectionName, key, cb)
 }
@@ -90,7 +94,6 @@ Bjorling.prototype.start = function() {
 	var me = this
 
 	storage.initialLoad(this._projectionName, function(err, lastProcessedPosition) {
-		console.log(me._projectionName, lastProcessedPosition)
 		var sub = me._subscription.replay(lastProcessedPosition + 1)
 		sub.on('event', function(evt) {
 			var handler = me._handlers[evt.__type]
