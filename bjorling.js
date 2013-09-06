@@ -37,11 +37,16 @@ Bjorling.prototype.execute = function(handler, eventData, position) {
 
 		state = state || {}
 
-		handler.call(context, state, eventData)
+		try {
+			handler.call(context, state, eventData)
 
-		storage.eventResult(projectionName, position, state, function(err) {
-			if(err) console.log(err)
-		})
+			storage.eventResult(projectionName, position, state, function(err) {
+				if(err) console.log(err)
+			})
+		}
+		catch(ex) {
+			console.error('Error in bjorling handler: ', projectionName, context, state, eventData)
+		}
 	}
 
 	if(key) {

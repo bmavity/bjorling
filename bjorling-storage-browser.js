@@ -42,7 +42,7 @@ function filter(projectionName, filterObj, cb) {
 				return filterFn(state)
 			})[0]
 
-	processQuery(projectionName, result, filterObj, cb)
+	processQuery(projectionName, result, filterObj.obj || filterObj, cb)
 }
 
 function getByKey(projectionName, key, cb) {
