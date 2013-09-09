@@ -24,6 +24,7 @@ function Bjorling(filename) {
 Bjorling.prototype.execute = function(handler, eventData, position) {
 	var projectionName = this._projectionName
 		, key = keys(projectionName, eventData)
+		, filter
 
 	function executeHandler(projectionName, state) {
 		var context = {
@@ -49,13 +50,18 @@ Bjorling.prototype.execute = function(handler, eventData, position) {
 		}
 	}
 
-	if(key) {
-		return executeHandler(projectionName, storage.getState(projectionName, key))
-	}
+	try {
+		if(key) {
+			return executeHandler(projectionName, storage.getState(projectionName, key))
+		}
 
-	var filter = filters(projectionName, eventData)	
-	if(filter) {
-		return executeHandler(projectionName, storage.getState(projectionName, filter))
+		filter = filters(projectionName, eventData)	
+		if(filter) {
+			return executeHandler(projectionName, storage.getState(projectionName, filter))
+		}
+	}
+	catch(ex) {
+		console.error(key, filter, ex)
 	}
 }
 
