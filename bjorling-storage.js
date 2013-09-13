@@ -83,7 +83,14 @@ function remove(projectionName, state) {
 
 function resolveFilter(projection, filterFn) {
 	return _.filter(projection, function(state, key) {
-		return filterFn(state)
+		var result
+		try {
+			result = filterFn(state)
+		}
+		catch(ex) {
+			console.log(key, state)
+		}
+		return result
 	})[0]
 }
 
