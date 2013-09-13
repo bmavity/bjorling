@@ -28,25 +28,39 @@ Bjorling.prototype.execute = function(handler, eventData, position) {
 
 	function executeHandler(projectionName, state) {
 		var context = {
-			join: join
-		, remove: remove
-		}
+					join: join
+				, remove: remove
+				}
+			, initialState = {}
+			, result
 
 		function remove() {
 			storage.remove(projectionName, state)
 		}
 
-		state = state || {}
+		state = state || initialState
 
 		try {
-			handler.call(context, state, eventData)
+			result = handler.call(context, state, eventData)
 
-			storage.eventResult(projectionName, position, state, function(err) {
+			if(!result && state === initialState) {
+				return
+			}
+
+			result = result || state
+
+			storage.eventResult(projectionName, position, result, function(err) {
 				if(err) console.log(err)
 			})
 		}
 		catch(ex) {
-			console.error('Error in bjorling handler: ', projectionName, context, state, eventData)
+			console.error('Error in bjorling handler: ', {
+				name: projectionName
+			, key: key
+			, filter: filter
+			, state: state
+			, eventData: eventData
+			})
 		}
 	}
 
@@ -61,7 +75,7 @@ Bjorling.prototype.execute = function(handler, eventData, position) {
 		}
 	}
 	catch(ex) {
-		console.error(key, filter, ex)
+		console.log(key, filter, ex.stack)
 	}
 }
 
