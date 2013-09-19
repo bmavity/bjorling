@@ -1,34 +1,48 @@
 {
-  "name": "bjorling"
-, "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
-, "repository": {
+  "name": "bjorling",
+  "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)",
+  "repository": {
     "type": "git",
     "url": "git://github.com/bmavity/bjorling.git"
-  }
-, "bugs": {
+  },
+  "bugs": {
     "url": "https://github.com/bmavity/bjorling/issues"
-  }
-, "contributors": [
+  },
+  "contributors": [
     "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
-  ]
-, "description": "Projection builder"
-, "dependencies": {
-		"atomic-write": "0.1.x"
-	, "eventemitter2": "0.4.x"
- 	, "sarastro": "0.0.x"
- 	, "underscore": "1.4.x"
-  }
-, "devDependencies": {
-  }
-, "engines": {
+  ],
+  "description": "Projection builder",
+  "dependencies": {
+    "atomic-write": "0.1.x",
+    "eventemitter2": "0.4.x",
+    "sarastro": "0.0.x",
+    "underscore": "1.4.x"
+  },
+  "devDependencies": {
+    "karma-script-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-jasmine": "~0.1.3",
+    "karma-requirejs": "~0.1.0",
+    "karma-coffee-preprocessor": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma": "~0.10.2",
+    "mocha": "~1.12.1",
+    "karma-mocha": "~0.1.0"
+  },
+  "engines": {
     "node": "0.8.x, 0.10.x"
   }
-, "keywords": [
-  ]
-, "browser": {
-    "./bjorling-storage.js": "./bjorling-storage-browser.js"
+, "scripts": {
+    "test": "mocha -r should -R tap test/**/*.js"
+  , "watch": "mocha -w -r should -R bdd test/**/*.js"
   }
-, "license": "mit +no-false-attribs, +no-advertising license"
-, "main": "./bjorling.js"
-, "version": "0.5.0"
+, "keywords": [],
+  "browser": {
+    "./bjorling-storage.js": "./bjorling-storage-browser.js"
+  },
+  "license": "mit +no-false-attribs, +no-advertising license",
+  "main": "./bjorling.js",
+  "version": "0.5.0"
 }
