@@ -1,2 +1,2 @@
 # bjorling
-## A Blog Engine Targeting node.js
+## A Projection Library for node.js and the browser
