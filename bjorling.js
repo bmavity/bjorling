@@ -13,7 +13,7 @@ function Bjorling(filename, opts) {
 }
 
 Bjorling.prototype.when = function(handlers) {
-	this._handlers = xtend(this._handlers, handlers)
+	this._handlers = handlers//xtend(this._handlers, handlers)
 }
 
 Bjorling.prototype.processEvent = function(anEvent) {
