@@ -19,6 +19,7 @@ Bjorling.prototype.when = function(handlers) {
 Bjorling.prototype.processEvent = function(anEvent) {
 	var handler = this._handlers[anEvent.__type]
 		, state = this._storage.getState(anEvent)
+	if(!handler) return
 	handler.call(null, state, anEvent.data)
 }
 

@@ -5,7 +5,6 @@ function addState(data, state) {
 }
 
 function getState(data) {
-	console.log(states, JSON.stringify(data), states[JSON.stringify(data)])
 	return states[JSON.stringify(data)]
 }
 

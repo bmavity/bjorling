@@ -28,7 +28,6 @@ describe('bjorling, when processing an event which has a handler', function() {
 		b = create()
 		b.when({
 			HasHandler: function(s, e) {
-				console.log(s, e)
 				state = s
 				calledWithEvent = e
 			}
@@ -48,6 +47,35 @@ describe('bjorling, when processing an event which has a handler', function() {
   })
 
   it('should call the handler with a context')
+})
+
+describe('bjorling, when processing an event which has a handler', function() {
+	var dataObj = {}
+		, evt = {
+				__type: 'DoesNotHaveHandler'
+			, data: dataObj
+			}
+		, stateObj = {}
+		, handlerWasCalled
+		, b
+
+	before(function() {
+		b = create()
+		handlerWasCalled = false
+		b.when({
+			HasHandler: function(s, e) {
+				handlerWasCalled = true
+			}
+		})
+		storage.addState(evt, stateObj)
+		b.processEvent(evt)
+	})
+
+  it('should not retrieve the state from storage')
+
+  it('should not call the handler', function() {
+  	handlerWasCalled.should.be.false
+  })
 })
 
 function create() {
