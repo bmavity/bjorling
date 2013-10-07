@@ -13,6 +13,7 @@
   ],
   "description": "Projection builder",
   "dependencies": {
+    "argp": "0.1.x",
     "atomic-write": "0.1.x",
     "eventemitter2": "0.4.x",
     "sarastro": "0.0.x",
@@ -29,6 +30,7 @@
     "karma-phantomjs-launcher": "~0.1.0",
     "karma": "~0.10.2",
     "mocha": "~1.12.1",
+    "should": "1.x.x",
     "karma-mocha": "~0.1.0"
   },
   "engines": {
@@ -36,7 +38,7 @@
   }
 , "scripts": {
     "test": "mocha -r should -R tap test/**/*.js"
-  , "watch": "mocha -w -r should -R bdd test/**/*.js"
+  , "watch": "mocha -w -r should -R spec test/**/*.js"
   }
 , "keywords": [],
   "browser": {

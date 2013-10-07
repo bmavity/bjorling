@@ -6,10 +6,9 @@ function Bjorling(filename, opts) {
 		return new Bjorling(filename, opts)
 	}
 
-	opts = opts || {}
 	this._handlers = {}
 	this._projectionName = path.basename(filename, path.extname(filename))
-	this._storage = opts.storage
+	this._storage = opts.storage(this._projectionName, opts.key)
 }
 
 Bjorling.prototype.when = function(handlers) {
@@ -18,8 +17,9 @@ Bjorling.prototype.when = function(handlers) {
 
 Bjorling.prototype.processEvent = function(anEvent) {
 	var handler = this._handlers[anEvent.__type]
-		, state = this._storage.getState(anEvent)
 	if(!handler) return
+		
+	var state = this._storage.getState(anEvent)
 	handler.call(null, state, anEvent.data)
 }
 

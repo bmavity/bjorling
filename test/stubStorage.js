@@ -1,13 +1,18 @@
-var states = {}
-
-function addState(data, state) {
-	states[JSON.stringify(data)] = state
+function StubStorage(projectionName, key) {
+	this._projectionName = projectionName
+	this._key = key
+	this._states = {}
 }
 
-function getState(data) {
-	return states[JSON.stringify(data)]
+StubStorage.prototype.addState = function(data, state) {
+	this._states[JSON.stringify(data)] = state
+}
+
+StubStorage.prototype.getState = function(data) {
+	return this._states[JSON.stringify(data)]
 }
 
 
-module.exports.addState = addState
-module.exports.getState = getState	
+module.exports = function stubStorage(projectionName, key) {
+	return new StubStorage(projectionName, key)
+}

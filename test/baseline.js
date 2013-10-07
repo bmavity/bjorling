@@ -3,17 +3,30 @@ var bjorling = require('../')
 
 describe('bjorling, when created', function() {
 	var b
+		, projectionName
+		, key
 
 	before(function() {
-		b = create()
+		b = bjorling(__filename, {
+					key: 'theKey'
+				, storage: function(p, k) {
+						projectionName = p
+						key = k
+						return storage(p, k)
+					}
+				})
 	})
 
-  it('should have the proper projection name', function() {
-  	b._projectionName.should.equal('baseline')
+  it('should initialize storage with proper projection name', function() {
+  	projectionName.should.equal('baseline')
+  })
+
+  it('should initialize storage with proper key', function() {
+  	key.should.equal('theKey')
   })
 })
 
-describe('bjorling, when processing an event which has a handler', function() {
+describe('bjorling, when processing an event which has a registered handler', function() {
 	var dataObj = {}
 		, evt = {
 				__type: 'HasHandler'
@@ -22,56 +35,83 @@ describe('bjorling, when processing an event which has a handler', function() {
 		, stateObj = {}
 		, state
 		, calledWithEvent
+		, storageEvent
 		, b
 
 	before(function() {
-		b = create()
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+							, gs = s.getState
+						s.addState(evt, stateObj)
+						s.getState = function(evt) {
+							storageEvent = evt
+							return gs.apply(s, arguments)
+						}
+						return s
+					}
+				})
+
 		b.when({
 			HasHandler: function(s, e) {
 				state = s
 				calledWithEvent = e
 			}
 		})
-		storage.addState(evt, stateObj)
 		b.processEvent(evt)
 	})
 
-  it('should retrieve the state from storage')
+  it('should retrieve the state from storage with raised event', function() {
+  	storageEvent.should.eql(evt)
+  })
 
   it('should call the handler with state as an argument', function() {
   	state.should.equal(stateObj)
   })
 
-  it('should call the handler with the event as an additional argument', function() {
+  it('should supply the matching handler with the event as the second argument', function() {
   	calledWithEvent.should.equal(dataObj)
   })
-
-  it('should call the handler with a context')
 })
 
-describe('bjorling, when processing an event which has a handler', function() {
+describe('bjorling, when processing an event which does not have a registered handler', function() {
 	var dataObj = {}
 		, evt = {
 				__type: 'DoesNotHaveHandler'
 			, data: dataObj
 			}
 		, stateObj = {}
-		, handlerWasCalled
+		, stateWasRetrieved = false
+		, handlerWasCalled = false
 		, b
 
 	before(function() {
-		b = create()
-		handlerWasCalled = false
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+							, gs = s.getState
+						s.addState(evt, stateObj)
+						s.getState = function(evt) {
+							stateWasRetrieved = true
+							return gs.apply(s, arguments)
+						}
+						return s
+					}
+				})
+
 		b.when({
 			HasHandler: function(s, e) {
 				handlerWasCalled = true
 			}
 		})
-		storage.addState(evt, stateObj)
 		b.processEvent(evt)
 	})
 
-  it('should not retrieve the state from storage')
+  it('should not retrieve the state from storage', function() {
+  	stateWasRetrieved.should.be.false
+  })
 
   it('should not call the handler', function() {
   	handlerWasCalled.should.be.false
