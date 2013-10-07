@@ -32,8 +32,6 @@ describe('bjorling, when processing an event which has a registered handler', fu
 				__type: 'HasHandler'
 			, data: dataObj
 			}
-		, stateObj = {}
-		, state
 		, calledWithEvent
 		, storageEvent
 		, b
@@ -44,7 +42,6 @@ describe('bjorling, when processing an event which has a registered handler', fu
 				, storage: function(p, k) {
 						var s = storage(p, k)
 							, gs = s.getState
-						s.addState(evt, stateObj)
 						s.getState = function(evt) {
 							storageEvent = evt
 							return gs.apply(s, arguments)
@@ -66,12 +63,104 @@ describe('bjorling, when processing an event which has a registered handler', fu
   	storageEvent.should.eql(evt)
   })
 
+  it('should supply the matching handler with the event as the second argument', function() {
+  	calledWithEvent.should.equal(dataObj)
+  })
+})
+
+describe('bjorling, when processing an event which has a registered handler and state is in storage', function() {
+	var evt = {
+				__type: 'HasHandler'
+			, data: {}
+			}
+		, stateObj = {}
+		, state
+		, b
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+						s.addState(evt, stateObj)
+						return s
+					}
+				})
+
+		b.when({
+			HasHandler: function(s, e) {
+				state = s
+			}
+		})
+		b.processEvent(evt)
+	})
+
   it('should call the handler with state as an argument', function() {
   	state.should.equal(stateObj)
   })
+})
 
-  it('should supply the matching handler with the event as the second argument', function() {
-  	calledWithEvent.should.equal(dataObj)
+describe('bjorling, when processing an event which has a registered handler, state is not in storage, and there is a $new function', function() {
+	var evt = {
+				__type: 'HasHandler'
+			, data: {}
+			}
+		, createResult = {}
+		, providedEvent
+		, state
+		, b
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: storage
+				})
+
+		b.when({
+			$new: function(e) {
+				providedEvent = e
+				return createResult
+			}
+		, HasHandler: function(s, e) {
+				state = s
+			}
+		})
+		b.processEvent(evt)
+	})
+
+  it('should call the handler with the result of the create function as the first argument', function() {
+  	providedEvent.should.equal(evt)
+  })
+
+  it('should call the handler with the result of the create function as the first argument', function() {
+  	state.should.equal(createResult)
+  })
+})
+
+describe('bjorling, when processing an event which has a registered handler, state is not in storage, and there is not a $new function', function() {
+	var evt = {
+				__type: 'HasHandler'
+			, data: {}
+			}
+		, state
+		, b
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: storage
+				})
+
+		b.when({
+			HasHandler: function(s, e) {
+				state = s
+			}
+		})
+		b.processEvent(evt)
+	})
+
+  it('should call the handler with an empty object as an argument', function() {
+  	state.should.eql({})
   })
 })
 

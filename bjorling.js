@@ -16,10 +16,18 @@ Bjorling.prototype.when = function(handlers) {
 }
 
 Bjorling.prototype.processEvent = function(anEvent) {
-	var handler = this._handlers[anEvent.__type]
+	var handlers = this._handlers
+		, handler = handlers[anEvent.__type]
 	if(!handler) return
-		
+
 	var state = this._storage.getState(anEvent)
+	if(!state) {
+		var $new = handlers['$new']
+		if($new) {
+			state = $new(anEvent)
+		}
+	}
+	state = state || {}
 	handler.call(null, state, anEvent.data)
 }
 
