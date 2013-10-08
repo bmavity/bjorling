@@ -27,7 +27,9 @@ describe('bjorling, when created', function() {
 })
 
 describe('bjorling, when processing an event which has a registered handler', function() {
-	var dataObj = {}
+	var dataObj = {
+				key2: 'toodles'
+			}
 		, evt = {
 				__type: 'HasHandler'
 			, data: dataObj
@@ -103,7 +105,9 @@ describe('bjorling, when processing an event which has a registered handler and 
 describe('bjorling, when processing an event which has a registered handler, state is not in storage, and there is a $new function', function() {
 	var evt = {
 				__type: 'HasHandler'
-			, data: {}
+			, data: {
+					key2: 'hello'
+				}
 			}
 		, createResult = {}
 		, providedEvent
@@ -128,7 +132,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 		b.processEvent(evt)
 	})
 
-  it('should call the handler with the result of the create function as the first argument', function() {
+  it('should call the $new function with the event as the only argument', function() {
   	providedEvent.should.equal(evt)
   })
 
@@ -140,7 +144,9 @@ describe('bjorling, when processing an event which has a registered handler, sta
 describe('bjorling, when processing an event which has a registered handler, state is not in storage, and there is not a $new function', function() {
 	var evt = {
 				__type: 'HasHandler'
-			, data: {}
+			, data: {
+					key2: 'hi'
+				}
 			}
 		, state
 		, b
@@ -161,6 +167,37 @@ describe('bjorling, when processing an event which has a registered handler, sta
 
   it('should call the handler with an empty object as an argument', function() {
   	state.should.eql({})
+  })
+})
+
+describe('bjorling, when processing an event which has a registered handler, state is not in storage, and the event does not have a key value', function() {
+	var evt = {
+				__type: 'HasHandler'
+			, data: {}
+			}
+		, $newWasCalled = false
+		, b
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: storage
+				})
+
+		b.when({
+			$new: function(e) {
+				$newWasCalled = true
+				return {}
+			}
+		, HasHandler: function(s, e) {
+				state = s
+			}
+		})
+		b.processEvent(evt)
+	})
+
+  it('should not call the $new function', function() {
+  	$newWasCalled.should.be.false
   })
 })
 

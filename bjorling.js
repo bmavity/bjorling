@@ -7,6 +7,7 @@ function Bjorling(filename, opts) {
 	}
 
 	this._handlers = {}
+	this._key = opts.key
 	this._projectionName = path.basename(filename, path.extname(filename))
 	this._storage = opts.storage(this._projectionName, opts.key)
 }
@@ -22,6 +23,9 @@ Bjorling.prototype.processEvent = function(anEvent) {
 
 	var state = this._storage.getState(anEvent)
 	if(!state) {
+		var keyVal = anEvent.data[this._key]
+		if(!keyVal) return
+
 		var $new = handlers['$new']
 		if($new) {
 			state = $new(anEvent)
