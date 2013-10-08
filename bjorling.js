@@ -32,7 +32,10 @@ Bjorling.prototype.processEvent = function(anEvent) {
 		}
 	}
 	state = state || {}
-	handler.call(null, state, anEvent.data)
+
+	var stateToSave = handler.call(null, state, anEvent.data)
+	stateToSave = stateToSave || state
+	this._storage.save(stateToSave)
 }
 
 

@@ -70,6 +70,86 @@ describe('bjorling, when processing an event which has a registered handler', fu
   })
 })
 
+describe('bjorling, when processing an event which has a registered handler, and the handler returns a falsy value', function() {
+	var evt = {
+				__type: 'HasHandler'
+			, data: {
+					key2: 'toodles'
+				}
+			}
+		, stateObj = {}
+		, savedItem
+		, b
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+							, saveFn = s.save
+						s.save = function(projection) {
+							savedItem = projection
+							return saveFn.apply(s, arguments)
+						}
+						s.addState(evt, stateObj)
+						return s
+					}
+				})
+
+		b.when({
+			HasHandler: function(s, e) {
+			}
+		})
+		b.processEvent(evt)
+	})
+
+  it('should save the state value to storage', function() {
+  	savedItem.should.equal(stateObj)
+  })
+})
+
+describe('bjorling, when processing an event which has a registered handler, and the handler returns a value', function() {
+	var evt = {
+				__type: 'HasHandler'
+			, data: {
+					key2: 'toodles'
+				}
+			}
+		, handlerReturn = {
+			  vals: ['val1']
+			}
+		, stateObj = {}
+		, savedItem
+		, b
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+							, saveFn = s.save
+						s.save = function(projection) {
+							savedItem = projection
+							return saveFn.apply(s, arguments)
+						}
+						s.addState(evt, stateObj)
+						return s
+					}
+				})
+
+		b.when({
+			HasHandler: function(s, e) {
+				return handlerReturn
+			}
+		})
+		b.processEvent(evt)
+	})
+
+  it('should save the returned value to storage', function() {
+  	savedItem.should.equal(handlerReturn)
+  })
+})
+
 describe('bjorling, when processing an event which has a registered handler and state is in storage', function() {
 	var evt = {
 				__type: 'HasHandler'

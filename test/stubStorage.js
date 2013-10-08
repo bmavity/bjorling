@@ -12,6 +12,9 @@ StubStorage.prototype.getState = function(data) {
 	return this._states[JSON.stringify(data)]
 }
 
+StubStorage.prototype.save = function(state) {
+
+}
 
 module.exports = function stubStorage(projectionName, key) {
 	return new StubStorage(projectionName, key)
