@@ -8,12 +8,15 @@ StubStorage.prototype.addState = function(data, state) {
 	this._states[JSON.stringify(data)] = state
 }
 
-StubStorage.prototype.getState = function(data) {
-	return this._states[JSON.stringify(data)]
+StubStorage.prototype.get = function(data, cb) {
+	var result = this._states[JSON.stringify(data)]
+	setImmediate(function() {
+		cb(null, result)
+	})
 }
 
-StubStorage.prototype.save = function(state) {
-
+StubStorage.prototype.save = function(state, cb) {
+	setImmediate(cb)
 }
 
 module.exports = function stubStorage(projectionName, key) {

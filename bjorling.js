@@ -16,26 +16,29 @@ Bjorling.prototype.when = function(handlers) {
 	this._handlers = handlers//xtend(this._handlers, handlers)
 }
 
-Bjorling.prototype.processEvent = function(anEvent) {
+Bjorling.prototype.processEvent = function(anEvent, cb) {
 	var handlers = this._handlers
 		, handler = handlers[anEvent.__type]
-	if(!handler) return
+		, storage = this._storage
+		, key = this._key
+	if(!handler) return cb && cb()
 
-	var state = this._storage.getState(anEvent)
-	if(!state) {
-		var keyVal = anEvent.data[this._key]
-		if(!keyVal) return
+	storage.get(anEvent, function(err, state) {
+		if(!state) {
+			var keyVal = anEvent.data[key]
+			if(!keyVal) return cb && cb()
 
-		var $new = handlers['$new']
-		if($new) {
-			state = $new(anEvent)
+			var $new = handlers['$new']
+			if($new) {
+				state = $new(anEvent)
+			}
 		}
-	}
-	state = state || {}
+		state = state || {}
 
-	var stateToSave = handler.call(null, state, anEvent.data)
-	stateToSave = stateToSave || state
-	this._storage.save(stateToSave)
+		var stateToSave = handler.call(null, state, anEvent.data)
+		stateToSave = stateToSave || state
+		storage.save(stateToSave, cb)
+	})
 }
 
 

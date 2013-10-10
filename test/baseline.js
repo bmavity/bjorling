@@ -38,13 +38,13 @@ describe('bjorling, when processing an event which has a registered handler', fu
 		, storageEvent
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: function(p, k) {
 						var s = storage(p, k)
-							, gs = s.getState
-						s.getState = function(evt) {
+							, gs = s.get
+						s.get = function(evt) {
 							storageEvent = evt
 							return gs.apply(s, arguments)
 						}
@@ -58,7 +58,7 @@ describe('bjorling, when processing an event which has a registered handler', fu
 				calledWithEvent = e
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should retrieve the state from storage with raised event', function() {
@@ -81,7 +81,7 @@ describe('bjorling, when processing an event which has a registered handler, and
 		, savedItem
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: function(p, k) {
@@ -100,7 +100,7 @@ describe('bjorling, when processing an event which has a registered handler, and
 			HasHandler: function(s, e) {
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should save the state value to storage', function() {
@@ -122,7 +122,7 @@ describe('bjorling, when processing an event which has a registered handler, and
 		, savedItem
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: function(p, k) {
@@ -142,7 +142,7 @@ describe('bjorling, when processing an event which has a registered handler, and
 				return handlerReturn
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should save the returned value to storage', function() {
@@ -159,7 +159,7 @@ describe('bjorling, when processing an event which has a registered handler and 
 		, state
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: function(p, k) {
@@ -174,7 +174,7 @@ describe('bjorling, when processing an event which has a registered handler and 
 				state = s
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should call the handler with state as an argument', function() {
@@ -194,7 +194,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 		, state
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: storage
@@ -209,7 +209,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 				state = s
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should call the $new function with the event as the only argument', function() {
@@ -231,7 +231,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 		, state
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: storage
@@ -242,7 +242,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 				state = s
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should call the handler with an empty object as an argument', function() {
@@ -258,7 +258,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 		, $newWasCalled = false
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: storage
@@ -273,7 +273,7 @@ describe('bjorling, when processing an event which has a registered handler, sta
 				state = s
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should not call the $new function', function() {
@@ -292,14 +292,14 @@ describe('bjorling, when processing an event which does not have a registered ha
 		, handlerWasCalled = false
 		, b
 
-	before(function() {
+	before(function(done) {
 		b = bjorling(__filename, {
 					key: 'key2'
 				, storage: function(p, k) {
 						var s = storage(p, k)
-							, gs = s.getState
+							, gs = s.get
 						s.addState(evt, stateObj)
-						s.getState = function(evt) {
+						s.get = function(evt) {
 							stateWasRetrieved = true
 							return gs.apply(s, arguments)
 						}
@@ -312,7 +312,7 @@ describe('bjorling, when processing an event which does not have a registered ha
 				handlerWasCalled = true
 			}
 		})
-		b.processEvent(evt)
+		b.processEvent(evt, done)
 	})
 
   it('should not retrieve the state from storage', function() {
