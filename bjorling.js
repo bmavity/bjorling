@@ -12,6 +12,10 @@ function Bjorling(filename, opts) {
 	this._storage = opts.storage(this._projectionName, opts.key)
 }
 
+Bjorling.prototype.addIndex = function(index, cb) {
+	this._storage.addIndex(index, cb)
+}
+
 Bjorling.prototype.when = function(handlers) {
 	this._handlers = handlers//xtend(this._handlers, handlers)
 }
@@ -39,6 +43,22 @@ Bjorling.prototype.processEvent = function(anEvent, cb) {
 		stateToSave = stateToSave || state
 		storage.save(stateToSave, cb)
 	})
+}
+
+function isObject(obj) {
+	return Object.prototype.toString.call(obj) === '[object Object]'
+}
+
+Bjorling.prototype.get = function(queryObj, cb) {
+	var query
+	if(isObject(queryObj)) {
+		query = queryObj
+	} else {
+		query = {}
+		query[this._key] = queryObj
+	}
+	
+	this._storage.get(query, cb)
 }
 
 
