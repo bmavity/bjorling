@@ -61,8 +61,8 @@ describe('bjorling, when processing an event which has a registered handler', fu
 		b.processEvent(evt, done)
 	})
 
-  it('should retrieve the state from storage with raised event', function() {
-  	storageEvent.should.eql(evt)
+  it('should retrieve the state from storage with date from the raised event', function() {
+  	storageEvent.should.eql(dataObj)
   })
 
   it('should supply the matching handler with the event as the second argument', function() {
@@ -91,7 +91,7 @@ describe('bjorling, when processing an event which has a registered handler, and
 							savedItem = projection
 							return saveFn.apply(s, arguments)
 						}
-						s.addState(evt, stateObj)
+						s.addState(evt.data, stateObj)
 						return s
 					}
 				})
@@ -132,7 +132,7 @@ describe('bjorling, when processing an event which has a registered handler, and
 							savedItem = projection
 							return saveFn.apply(s, arguments)
 						}
-						s.addState(evt, stateObj)
+						s.addState(evt.data, stateObj)
 						return s
 					}
 				})
@@ -164,7 +164,7 @@ describe('bjorling, when processing an event which has a registered handler and 
 					key: 'key2'
 				, storage: function(p, k) {
 						var s = storage(p, k)
-						s.addState(evt, stateObj)
+						s.addState(evt.data, stateObj)
 						return s
 					}
 				})

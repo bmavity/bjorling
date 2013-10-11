@@ -27,7 +27,7 @@ Bjorling.prototype.processEvent = function(anEvent, cb) {
 		, key = this._key
 	if(!handler) return cb && cb()
 
-	storage.get(anEvent, function(err, state) {
+	storage.get(anEvent.data, function(err, state) {
 		if(!state) {
 			var keyVal = anEvent.data[key]
 			if(!keyVal) return cb && cb()
@@ -57,7 +57,7 @@ Bjorling.prototype.get = function(queryObj, cb) {
 		query = {}
 		query[this._key] = queryObj
 	}
-	
+
 	this._storage.get(query, cb)
 }
 
