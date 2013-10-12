@@ -15,6 +15,10 @@ StubStorage.prototype.get = function(data, cb) {
 	})
 }
 
+StubStorage.prototype.getKeyValue = function(data) {
+	return data[this._key]
+}
+
 StubStorage.prototype.save = function(state, cb) {
 	setImmediate(cb)
 }

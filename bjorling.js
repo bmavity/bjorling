@@ -24,12 +24,11 @@ Bjorling.prototype.processEvent = function(anEvent, cb) {
 	var handlers = this._handlers
 		, handler = handlers[anEvent.__type]
 		, storage = this._storage
-		, key = this._key
 	if(!handler) return cb && cb()
 
 	storage.get(anEvent.data, function(err, state) {
 		if(!state) {
-			var keyVal = anEvent.data[key]
+			var keyVal = storage.getKeyValue(anEvent.data)
 			if(!keyVal) return cb && cb()
 
 			var $new = handlers['$new']

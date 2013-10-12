@@ -36,6 +36,7 @@ describe('bjorling, when processing an event which has a registered handler', fu
 			}
 		, calledWithEvent
 		, storageEvent
+		, retrievedKeyFromStorage = false
 		, b
 
 	before(function(done) {
@@ -44,9 +45,14 @@ describe('bjorling, when processing an event which has a registered handler', fu
 				, storage: function(p, k) {
 						var s = storage(p, k)
 							, gs = s.get
+							, gkv = s.getKeyValue
 						s.get = function(evt) {
 							storageEvent = evt
 							return gs.apply(s, arguments)
+						}
+						s.getKeyValue = function() {
+							retrievedKeyFromStorage = true
+							return gkv.apply(s, arguments)
 						}
 						return s
 					}
@@ -60,6 +66,10 @@ describe('bjorling, when processing an event which has a registered handler', fu
 		})
 		b.processEvent(evt, done)
 	})
+
+  it('should get the key value from storage', function() {
+  	retrievedKeyFromStorage.should.be.true
+  })
 
   it('should retrieve the state from storage with date from the raised event', function() {
   	storageEvent.should.eql(dataObj)
