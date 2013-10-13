@@ -222,8 +222,8 @@ describe('bjorling, when processing an event which has a registered handler, sta
 		b.processEvent(evt, done)
 	})
 
-  it('should call the $new function with the event as the only argument', function() {
-  	providedEvent.should.equal(evt)
+  it('should call the $new function with the event data as the only argument', function() {
+  	providedEvent.should.equal(evt.data)
   })
 
   it('should call the handler with the result of the create function as the first argument', function() {
@@ -288,6 +288,83 @@ describe('bjorling, when processing an event which has a registered handler, sta
 
   it('should not call the $new function', function() {
   	$newWasCalled.should.be.false
+  })
+})
+
+describe('bjorling, when processing an event which has a registered transformer', function() {
+	var dataObj = {
+				originalKey: 'toodles'
+			, val: 'original'
+			}
+		, evt = {
+				__type: 'HasHandler'
+			, data: dataObj
+			}
+		, transformedEventData = {
+				key2: dataObj.originalKey
+			, valId: dataObj.val
+			}
+		, calledWithEvent
+		, keyEventData
+		, storageEvent
+		, eventWasTransformed = false
+		, b
+
+	before(function(done) {
+		b = bjorling(__filename, {
+					key: 'key2'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+							, gs = s.get
+							, gkv = s.getKeyValue
+						s.get = function(evt) {
+							storageEvent = evt
+							return gs.apply(s, arguments)
+						}
+						s.getKeyValue = function(ked) {
+							keyEventData = ked
+							return gkv.apply(s, arguments)
+						}
+						return s
+					}
+				})
+
+		b.transform({
+			HasHandler: function(e) {
+				eventWasTransformed = true
+				return transformedEventData
+			}
+		})
+
+		b.when({
+			$new: function(e) {
+				$newEventData = e
+			}
+		, HasHandler: function(s, e) {
+				calledWithEvent = e
+			}
+		})
+		b.processEvent(evt, done)
+	})
+
+	it('should transform the event data', function() {
+		eventWasTransformed.should.be.true
+	})
+
+  it('should retrieve the state from storage with the transformed event data', function() {
+  	storageEvent.should.equal(transformedEventData)
+  })
+
+  it('should retrieve the key from storage with the transformed event data', function() {
+  	keyEventData.should.equal(transformedEventData)
+  })
+
+  it('should call the $new function with the transformed event data', function() {
+  	$newEventData.should.equal(transformedEventData)
+  })
+
+  it('should supply the matching handler with the transformed event as the second argument', function() {
+  	calledWithEvent.should.equal(transformedEventData)
   })
 })
 

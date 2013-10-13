@@ -10,6 +10,7 @@ function Bjorling(filename, opts) {
 	this._key = opts.key
 	this._projectionName = path.basename(filename, path.extname(filename))
 	this._storage = opts.storage(this._projectionName, opts.key)
+	this._transformers = {}
 }
 
 Bjorling.prototype.addIndex = function(index, cb) {
@@ -20,25 +21,36 @@ Bjorling.prototype.when = function(handlers) {
 	this._handlers = handlers//xtend(this._handlers, handlers)
 }
 
-Bjorling.prototype.processEvent = function(anEvent, cb) {
-	var handlers = this._handlers
-		, handler = handlers[anEvent.__type]
-		, storage = this._storage
-	if(!handler) return cb && cb()
+Bjorling.prototype.transform = function(transformers) {
+	this._transformers = transformers
+}
 
-	storage.get(anEvent.data, function(err, state) {
+Bjorling.prototype.processEvent = function(anEvent, cb) {
+	var eventType = anEvent.__type
+		, handlers = this._handlers
+		, handler = handlers[eventType]
+		, transformers = this._transformers
+		, transformer = transformers[eventType]
+		, storage = this._storage
+		, eventData = anEvent.data
+	if(!handler) return cb && cb()
+	if(transformer) {
+		eventData = transformer(eventData)
+	}
+
+	storage.get(eventData, function(err, state) {
 		if(!state) {
-			var keyVal = storage.getKeyValue(anEvent.data)
+			var keyVal = storage.getKeyValue(eventData)
 			if(!keyVal) return cb && cb()
 
 			var $new = handlers['$new']
 			if($new) {
-				state = $new(anEvent)
+				state = $new(eventData)
 			}
 		}
 		state = state || {}
 
-		var stateToSave = handler.call(null, state, anEvent.data)
+		var stateToSave = handler.call(null, state, eventData)
 		stateToSave = stateToSave || state
 		storage.save(stateToSave, cb)
 	})
