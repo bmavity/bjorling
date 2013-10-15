@@ -33,7 +33,12 @@ Bjorling.prototype.processEvent = function(anEvent, cb) {
 		, transformer = transformers[eventType]
 		, storage = this._storage
 		, eventData = anEvent.data
-	if(!handler) return cb && cb()
+	if(!handler) {
+		return setImmediate(function() {
+			cb && cb()
+		})
+	}
+
 	if(transformer) {
 		eventData = transformer(eventData)
 	}
@@ -52,7 +57,9 @@ Bjorling.prototype.processEvent = function(anEvent, cb) {
 
 		var stateToSave = handler.call(null, state, eventData)
 		stateToSave = stateToSave || state
-		storage.save(stateToSave, cb)
+		storage.save(stateToSave, function(err, r) {
+			cb(err, r)
+		})
 	})
 }
 
