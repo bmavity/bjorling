@@ -40,6 +40,12 @@
     "test": "mocha -r should -R tap test/**/*.js"
   , "watch": "mocha -w -r should -R spec test/**/*.js"
   }
+<<<<<<< HEAD
+, "license": "mit +no-false-attribs, +no-advertising license"
+, "main": "./bjorling.js"
+, "version": "0.4.6"
+}
+=======
 , "keywords": [],
   "browser": {
     "./bjorling-storage.js": "./bjorling-storage-browser.js"
@@ -48,3 +54,4 @@
   "main": "./bjorling.js",
   "version": "0.5.0"
 }
+>>>>>>> dev-0.5

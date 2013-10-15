@@ -1,0 +1,34 @@
+{
+  "name": "bjorling"
+, "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+, "repository": {
+    "type": "git",
+    "url": "git://github.com/bmavity/bjorling.git"
+  }
+, "bugs": {
+    "url": "https://github.com/bmavity/bjorling/issues"
+  }
+, "contributors": [
+    "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+  ]
+, "description": "Projection builder"
+, "dependencies": {
+		"atomic-write": "0.1.x"
+	, "eventemitter2": "0.4.x"
+ 	, "sarastro": "0.0.x"
+ 	, "underscore": "1.4.x"
+  }
+, "devDependencies": {
+  }
+, "engines": {
+    "node": "0.8.x, 0.10.x"
+  }
+, "keywords": [
+  ]
+, "browser": {
+    "./bjorling-storage.js": "./bjorling-storage-browser.js"
+  }
+, "license": "mit +no-false-attribs, +no-advertising license"
+, "main": "./bjorling.js"
+, "version": "0.4.5"
+}

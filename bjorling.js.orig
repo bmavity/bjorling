@@ -7,10 +7,76 @@ function Bjorling(filename, opts) {
 	}
 
 	this._handlers = {}
+<<<<<<< HEAD
+	this._subscription = subscriptionFactory()
+}
+
+Bjorling.prototype.execute = function(handler, eventData, position) {
+	var projectionName = this._projectionName
+		, key = keys(projectionName, eventData)
+		, filter
+
+	function executeHandler(projectionName, state) {
+		var context = {
+					join: join
+				, remove: remove
+				}
+			, initialState = {}
+			, result
+
+		function remove() {
+			storage.remove(projectionName, state)
+		}
+
+		state = state || initialState
+
+		try {
+			result = handler.call(context, state, eventData)
+
+			if(!result && state === initialState) {
+				return
+			}
+
+			result = result || state
+
+			storage.eventResult(projectionName, position, result, function(err) {
+				if(err) console.log(err)
+			})
+		}
+		catch(ex) {
+			console.error('Error in bjorling handler: ', {
+				name: projectionName
+			, key: key
+			, filter: filter
+			, state: state
+			, eventData: eventData
+			})
+		}
+	}
+
+	try {
+		if(key) {
+			return executeHandler(projectionName, storage.getState(projectionName, key))
+		}
+
+		filter = filters(projectionName, eventData)	
+		if(filter) {
+			return executeHandler(projectionName, storage.getState(projectionName, filter))
+		}
+	}
+	catch(ex) {
+		console.log(key, filter, ex.stack)
+	}
+}
+
+Bjorling.prototype.getAll = function(cb) {
+	storage.getAll(this._projectionName, cb)
+=======
 	this._key = opts.key
 	this._projectionName = path.basename(filename, path.extname(filename))
 	this._storage = opts.storage(this._projectionName, opts.key)
 	this._transformers = {}
+>>>>>>> dev-0.5
 }
 
 Bjorling.prototype.addIndex = function(index, cb) {
