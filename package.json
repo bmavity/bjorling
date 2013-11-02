@@ -34,17 +34,14 @@
     "karma-mocha": "~0.1.0"
   },
   "engines": {
-    "node": "0.8.x, 0.10.x"
+    "node": "0.10.x"
   }
 , "scripts": {
     "test": "mocha -r should -R tap test/**/*.js"
   , "watch": "mocha -w -r should -R spec test/**/*.js"
   }
 , "keywords": [],
-  "browser": {
-    "./bjorling-storage.js": "./bjorling-storage-browser.js"
-  },
   "license": "mit +no-false-attribs, +no-advertising license",
   "main": "./bjorling.js",
-  "version": "0.5.1"
+  "version": "0.5.2"
 }
