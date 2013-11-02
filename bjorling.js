@@ -1,5 +1,4 @@
 var path = require('path')
-	, xtend = require('xtend')
 
 function Bjorling(filename, opts) {
 	if(!(this instanceof Bjorling)) {
@@ -18,7 +17,7 @@ Bjorling.prototype.addIndex = function(index, cb) {
 }
 
 Bjorling.prototype.when = function(handlers) {
-	this._handlers = handlers//xtend(this._handlers, handlers)
+	this._handlers = handlers
 }
 
 Bjorling.prototype.transform = function(transformers) {
