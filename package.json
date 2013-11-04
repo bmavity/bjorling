@@ -39,5 +39,5 @@
 , "keywords": [],
   "license": "mit +no-false-attribs, +no-advertising license",
   "main": "./bjorling.js",
-  "version": "0.5.2"
+  "version": "0.6.0"
 }
