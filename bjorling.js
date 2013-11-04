@@ -1,15 +1,26 @@
 var path = require('path')
+	, util = require('util')
+	, Writable = require('stream').Writable
 
-function Bjorling(filename, opts) {
+util.inherits(Bjorling, Writable)
+
+function Bjorling(filename, options) {
+	options = options || {}
+	options.objectMode = true
 	if(!(this instanceof Bjorling)) {
-		return new Bjorling(filename, opts)
+		return new Bjorling(filename, options)
 	}
+	Writable.call(this, options)
 
 	this._handlers = {}
-	this._key = opts.key
+	this._key = options.key
 	this._projectionName = path.basename(filename, path.extname(filename))
-	this._storage = opts.storage(this._projectionName, opts.key)
+	this._storage = options.storage(this._projectionName, options.key)
 	this._transformers = {}
+}
+
+Bjorling.prototype._write = function(chunk, encoding, done) {
+	this.processEvent(chunk, done)
 }
 
 Bjorling.prototype.addIndex = function(index, cb) {
