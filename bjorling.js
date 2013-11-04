@@ -31,6 +31,10 @@ Bjorling.prototype.when = function(handlers) {
 	this._handlers = handlers
 }
 
+Bjorling.prototype.reset = function(cb) {
+	this._storage.reset(cb)
+}
+
 Bjorling.prototype.transform = function(transformers) {
 	this._transformers = transformers
 }

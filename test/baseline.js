@@ -411,6 +411,32 @@ describe('bjorling, when processing an event which does not have a registered ha
   })
 })
 
+describe('bjorling, when reset', function() {
+	var b
+		, storageWasReset
+
+	before(function() {
+		b = bjorling(__filename, {
+					key: 'theKey'
+				, storage: function(p, k) {
+						var s = storage(p, k)
+							, r = s.reset
+						s.reset = function(cb) {
+							storageWasReset = true
+							return r.apply(s, arguments)
+						}
+						return s
+					}
+				})
+		b.reset()
+	})
+
+  it('should reset storage', function() {
+  	storageWasReset.should.be.true
+  })
+})
+
+
 function create() {
 	return bjorling(__filename, {
 		storage: storage
